@@ -1,6 +1,8 @@
-import paddle.fluid as fluid
+import numpy as np
 import paddle as paddle
 import paddle.dataset.mnist as mnist
+import paddle.fluid as fluid
+from PIL import Image
 
 
 def multilayer_perceptron(input):
@@ -66,7 +68,7 @@ exe.run(fluid.default_startup_program())
 
 feeder = fluid.DataFeeder(place=place, feed_list=[image, label])
 
-for pass_id in range(100):
+for pass_id in range(1):
     for batch_id, data in enumerate(train_reader()):
         train_cost, train_acc = exe.run(program=train_program,
                                         feed=feeder.feed(data),
@@ -88,3 +90,19 @@ for pass_id in range(100):
     print('Test:', pass_id, ', Cost:', test_cost, ' ,Accuracy:', test_acc)
 
 
+def load_image(file):
+    im = Image.open(file).convert('L')
+    im = im.resize((28, 28), Image.ANTIALIAS)
+    im = np.array(im).reshape(1, 1, 28, 28).astype(np.float32)
+    im = im / 255.0 * 2.0 - 1.0
+    return im
+
+
+img = load_image('./infer_3.png')
+
+results = exe.run(program=test_program,
+                  feed={'image': img},
+                  fetch_list=[model])
+
+lab = np.argsort(results)
+print("Inference result of infer_3.png is: %d" % lab[0][0][-1])

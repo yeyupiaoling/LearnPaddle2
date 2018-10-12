@@ -1,7 +1,6 @@
-import os
 import paddle
-import paddle.fluid as fluid
 import paddle.dataset.imdb as imdb
+import paddle.fluid as fluid
 
 CLASS_DIM = 2
 EMB_DIM = 128
@@ -25,6 +24,7 @@ words = fluid.layers.data(name='words', shape=[1], dtype='int64', lod_level=1)
 label = fluid.layers.data(name='label', shape=[1], dtype='int64')
 
 word_dict = imdb.word_dict()
+print(word_dict)
 dict_dim = len(word_dict)
 model = lstm_net(words, dict_dim, CLASS_DIM, EMB_DIM, HID_DIM)
 
@@ -43,7 +43,7 @@ exe = fluid.Executor(place)
 exe.run(fluid.default_startup_program())
 
 train_reader = paddle.batch(imdb.train(word_dict), batch_size=128)
-test_reader = paddle.batch(imdb.test(word_dict), batch_size=128)
+test_reader = paddle.batch(imdb.test(word_dict), batch_size=4)
 
 feeder = fluid.DataFeeder(place=place, feed_list=[words, label])
 
@@ -52,6 +52,7 @@ for pass_id in range(100):
         train_cost, train_acc = exe.run(program=train_program,
                                         feed=feeder.feed(data),
                                         fetch_list=[cost, acc])
+        print(train_acc)
         if batch_id % 100 == 0:
             print('Pass:', pass_id, ', Batch:', batch_id, ', Cost:',
                   train_cost[0][0], ', Accuracy:', train_acc[0])
@@ -67,3 +68,23 @@ for pass_id in range(100):
     test_cost = (sum(test_costs) / len(test_costs))
     test_acc = (sum(test_accs) / len(test_accs))
     print('Test:', pass_id, ', Cost:', test_cost, ', ACC:', test_acc)
+
+reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
+reviews = [c.split() for c in reviews_str]
+
+UNK = word_dict['<unk>']
+lod = []
+for c in reviews:
+    lod.append([word_dict.get(words, UNK) for words in c])
+
+base_shape = [[len(c) for c in lod]]
+
+tensor_words = fluid.create_lod_tensor(lod, base_shape, place)
+
+results = exe.run(program=test_program,
+                  feed={'words': tensor_words},
+                  fetch_list=[model])
+
+for i, r in enumerate(results[0]):
+    print("Predict probability of ", r[0], " to be positive and ", r[1], " to be negative for review \'",
+          reviews_str[i], "\'")

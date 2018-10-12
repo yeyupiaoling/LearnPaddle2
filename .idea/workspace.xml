@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/note3/test.py" line="27" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1895676-cf25-41bf-825a-273a63f1757c" name="Default" comment="" />
+    <list default="true" id="a1895676-cf25-41bf-825a-273a63f1757c" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/note3/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/note3/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/note4/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/note4/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/note5/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/note5/test.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -12,12 +19,21 @@
   <component name="FileEditorManager">
     <leaf>
       <file leaf-file-name="test.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/note5/test.py">
+        <entry file="file://$PROJECT_DIR$/note3/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="37" column="55" selection-start-line="37" selection-start-column="55" selection-end-line="37" selection-end-column="55" />
+            <state relative-caret-position="242">
+              <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/note4/test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="232">
+              <caret line="51" selection-start-line="51" selection-end-line="59" selection-end-column="35" />
               <folding>
-                <element signature="e#0#9#0" expanded="true" />
+                <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -32,15 +48,18 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/note2/test.py" />
         <option value="$PROJECT_DIR$/note1/test.py" />
-        <option value="$PROJECT_DIR$/note3/test.py" />
         <option value="$PROJECT_DIR$/note4/test2.py" />
         <option value="$PROJECT_DIR$/note4/test.py" />
         <option value="$PROJECT_DIR$/note5/test.py" />
+        <option value="$PROJECT_DIR$/note3/test.py" />
       </list>
     </option>
   </component>
@@ -49,6 +68,9 @@
     <option name="y" value="-2" />
     <option name="width" value="1185" />
     <option name="height" value="1303" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -65,6 +87,11 @@
             <path>
               <item name="LearnPaddle2" type="b2602c69:ProjectViewProjectNode" />
               <item name="LearnPaddle2" type="462c0819:PsiDirectoryNode" />
+              <item name="note3" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="LearnPaddle2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="LearnPaddle2" type="462c0819:PsiDirectoryNode" />
               <item name="note4" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -73,6 +100,11 @@
       </pane>
       <pane id="Scope" />
     </panes>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/note4" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -86,7 +118,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.test (3)">
+  <component name="RunManager" selected="Python.test (2)">
     <configuration name="test (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="LearnPaddle2" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -186,8 +218,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.test (3)" />
         <item itemvalue="Python.test (2)" />
+        <item itemvalue="Python.test (3)" />
         <item itemvalue="Python.test2" />
         <item itemvalue="Python.test (1)" />
         <item itemvalue="Python.test" />
@@ -208,14 +240,14 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="88" y="-2" width="1185" height="1303" extended-state="6" />
+    <frame x="88" y="-2" width="2473" height="1313" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.28125" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17295082" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.38337803" />
-      <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.38154393" />
+      <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" />
@@ -248,13 +280,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/note3/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="6" selection-start-line="6" selection-end-line="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/lib/python3.5/dist-packages/paddle/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -282,23 +307,47 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/note4/test.py">
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3/functools.pyi">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-17">
-          <caret line="67" lean-forward="true" selection-start-line="67" selection-end-line="67" />
+        <state relative-caret-position="535">
+          <caret line="45" column="8" selection-start-line="45" selection-start-column="8" selection-end-line="45" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/python3.5/functools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="241" column="17" lean-forward="true" selection-start-line="240" selection-start-column="7" selection-end-line="241" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/note4/infer_3.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/note5/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1264">
+          <caret line="10" column="32" selection-start-line="10" selection-start-column="32" selection-end-line="10" selection-end-column="32" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/note5/test.py">
+    <entry file="file://$PROJECT_DIR$/note4/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="37" column="55" selection-start-line="37" selection-start-column="55" selection-end-line="37" selection-end-column="55" />
+        <state relative-caret-position="232">
+          <caret line="51" selection-start-line="51" selection-end-line="59" selection-end-column="35" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/note3/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
         </state>
       </provider>
     </entry>
