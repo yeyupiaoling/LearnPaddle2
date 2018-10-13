@@ -2,21 +2,17 @@ import paddle
 import paddle.dataset.imdb as imdb
 import paddle.fluid as fluid
 
-CLASS_DIM = 2
-EMB_DIM = 128
-HID_DIM = 512
 
+def lstm_net(data, input_dim):
+    emb = fluid.layers.embedding(input=data, size=[input_dim, 128], is_sparse=True)
 
-def lstm_net(data, input_dim, class_dim, emb_dim, hid_dim):
-    emb = fluid.layers.embedding(input=data, size=[input_dim, emb_dim], is_sparse=True)
-
-    fc1 = fluid.layers.fc(input=emb, size=hid_dim)
-    lstm1, _ = fluid.layers.dynamic_lstm(input=fc1, size=hid_dim)
+    fc1 = fluid.layers.fc(input=emb, size=512)
+    lstm1, _ = fluid.layers.dynamic_lstm(input=fc1, size=512)
 
     fc2 = fluid.layers.sequence_pool(input=fc1, pool_type='max')
     lstm2 = fluid.layers.sequence_pool(input=lstm1, pool_type='max')
 
-    out = fluid.layers.fc(input=[fc2, lstm2], size=class_dim, act='softmax')
+    out = fluid.layers.fc(input=[fc2, lstm2], size=2, act='softmax')
     return out
 
 
@@ -26,7 +22,7 @@ label = fluid.layers.data(name='label', shape=[1], dtype='int64')
 word_dict = imdb.word_dict()
 print(word_dict)
 dict_dim = len(word_dict)
-model = lstm_net(words, dict_dim, CLASS_DIM, EMB_DIM, HID_DIM)
+model = lstm_net(words, dict_dim)
 
 cost = fluid.layers.cross_entropy(input=model, label=label)
 avg_cost = fluid.layers.mean(cost)
@@ -49,13 +45,11 @@ feeder = fluid.DataFeeder(place=place, feed_list=[words, label])
 
 for pass_id in range(100):
     for batch_id, data in enumerate(train_reader()):
-        train_cost, train_acc = exe.run(program=train_program,
+        train_cost = exe.run(program=train_program,
                                         feed=feeder.feed(data),
-                                        fetch_list=[cost, acc])
-        print(train_acc)
-        if batch_id % 100 == 0:
-            print('Pass:', pass_id, ', Batch:', batch_id, ', Cost:',
-                  train_cost[0][0], ', Accuracy:', train_acc[0])
+                                        fetch_list=[cost])
+        if batch_id == 0:
+            print('Pass:', pass_id, ', Batch:', batch_id, ', Cost:', train_cost[0][0])
 
     test_costs = []
     test_accs = []
