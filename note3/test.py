@@ -21,6 +21,7 @@ opts = optimizer.minimize(avg_cost)
 # 创建一个使用CPU的解释器
 place = fluid.CPUPlace()
 exe = fluid.Executor(place)
+# 进行参数初始化
 exe.run(fluid.default_startup_program())
 
 # 定义训练和测试数据
