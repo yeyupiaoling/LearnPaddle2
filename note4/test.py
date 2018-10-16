@@ -74,8 +74,8 @@ for pass_id in range(1):
                                         feed=feeder.feed(data),
                                         fetch_list=[avg_cost, acc])
         if batch_id % 100 == 0:
-            print('Pass:', pass_id, ', Batch:', batch_id,
-                  ', Cost:', train_cost[0], ', Accuracy:', train_acc[0])
+            print('Pass:%d, Batch:%d, Cost:%0.5f, Accuracy:%0.5f' %
+                  (pass_id, batch_id, train_cost[0], train_acc[0]))
 
     test_accs = []
     test_costs = []
@@ -87,7 +87,7 @@ for pass_id in range(1):
         test_costs.append(test_cost[0])
     test_cost = (sum(test_costs) / len(test_costs))
     test_acc = (sum(test_accs) / len(test_accs))
-    print('Test:', pass_id, ', Cost:', test_cost, ' ,Accuracy:', test_acc)
+    print('Test:%d, Cost:%0.5f, Accuracy:%0.5f' % (pass_id, test_cost, test_acc))
 
 
 def load_image(file):
@@ -101,7 +101,7 @@ def load_image(file):
 img = load_image('./infer_3.png')
 
 results = exe.run(program=test_program,
-                  feed={'image': img},
+                  feed={'image': img, "label": np.array([[1]]).astype("int64")},
                   fetch_list=[model])
 
 lab = np.argsort(results)
