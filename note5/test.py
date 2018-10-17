@@ -3,6 +3,20 @@ import paddle.dataset.imdb as imdb
 import paddle.fluid as fluid
 import numpy as np
 
+def rnn_net(ipt, input_dim):
+    emb = fluid.layers.embedding(input=ipt, size=[input_dim, 128], is_sparse=True)
+
+    rnn = fluid.layers.DynamicRNN()
+    with rnn.block():
+        word = rnn.step_input(emb)
+        prev = rnn.memory(shape=[200])
+        hidden = fluid.layers.fc(input=[word, prev], size=200, act='relu')
+        rnn.update_memory(prev, hidden)
+        rnn.output(hidden)
+
+    last = fluid.layers.sequence_last_step(rnn())
+    out = fluid.layers.fc(input=last, size=2, act='softmax')
+    return out
 
 # 定义长短期记忆网络
 def lstm_net(ipt, input_dim):
@@ -29,11 +43,13 @@ words = fluid.layers.data(name='words', shape=[1], dtype='int64', lod_level=1)
 label = fluid.layers.data(name='label', shape=[1], dtype='int64')
 
 # 获取数据字典
+print("加载数据字典中...")
 word_dict = imdb.word_dict()
 # 获取数据字典长度
 dict_dim = len(word_dict)
 # 获取长短期记忆网络
-model = lstm_net(words, dict_dim)
+# model = lstm_net(words, dict_dim)
+model = rnn_net(words, dict_dim)
 
 # 获取损失函数和准确率
 cost = fluid.layers.cross_entropy(input=model, label=label)
@@ -55,7 +71,9 @@ exe = fluid.Executor(place)
 exe.run(fluid.default_startup_program())
 
 # 获取训练和预测数据
+print("加载训练数据中...")
 train_reader = paddle.batch(imdb.train(word_dict), batch_size=128)
+print("加载测试数据中...")
 test_reader = paddle.batch(imdb.test(word_dict), batch_size=4)
 
 # 定义输入数据的维度
