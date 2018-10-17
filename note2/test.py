@@ -17,4 +17,4 @@ exe.run(fluid.default_main_program())
 result = exe.run(program=fluid.default_main_program(),
                  fetch_list=[y])
 # 输出计算结果
-print(result)
+print("1+1 =", result[0][0])

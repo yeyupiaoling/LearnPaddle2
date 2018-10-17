@@ -40,4 +40,4 @@ for pass_id in range(100):
 result = exe.run(program=test_program,
                  feed={'x': test_data, 'y': np.array([[0.0]]).astype('float32')},
                  fetch_list=[net])
-print("When x is 6.0, y is :%0.5f:" % result[0][0][0])
+print("当x为6.0时，y为：%0.5f:" % result[0][0][0])

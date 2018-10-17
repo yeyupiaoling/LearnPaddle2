@@ -52,8 +52,8 @@ image = fluid.layers.data(name='image', shape=[1, 28, 28], dtype='float32')
 label = fluid.layers.data(name='label', shape=[1], dtype='int64')
 
 # 获取分类器
-model = multilayer_perceptron(image)
-# model = convolutional_neural_network(image)
+# model = multilayer_perceptron(image)
+model = convolutional_neural_network(image)
 
 # 获取损失函数和准确率函数
 cost = fluid.layers.cross_entropy(input=model, label=label)
@@ -82,7 +82,7 @@ exe.run(fluid.default_startup_program())
 feeder = fluid.DataFeeder(place=place, feed_list=[image, label])
 
 # 开始训练和测试
-for pass_id in range(1):
+for pass_id in range(10):
     # 进行训练
     for batch_id, data in enumerate(train_reader()):
         train_cost, train_acc = exe.run(program=train_program,
@@ -123,4 +123,4 @@ results = exe.run(program=test_program,
 
 # 获取概率最大的label
 lab = np.argsort(results)
-print("Inference result of infer_3.png is: %d" % lab[0][0][-1])
+print("该图片的预测结果的label为: %d" % lab[0][0][-1])
