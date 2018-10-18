@@ -81,15 +81,15 @@ with fluid.program_guard(train_d_real, startup):
     # 判别器D判断真实图片的概率
     p_real = Discriminator(real_image)
     # 获取损失函数
-    cost = fluid.layers.sigmoid_cross_entropy_with_logits(p_real, ones)
-    avg_cost = fluid.layers.mean(cost)
+    real_cost = fluid.layers.sigmoid_cross_entropy_with_logits(p_real, ones)
+    real_avg_cost = fluid.layers.mean(real_cost)
 
     # 获取判别器D的参数
     d_params = get_params(train_d_real, "D")
 
     # 创建优化方法
     optimizer = fluid.optimizer.Adam(learning_rate=0.0002)
-    optimizer.minimize(avg_cost, parameter_list=d_params)
+    optimizer.minimize(real_avg_cost, parameter_list=d_params)
 
 # 训练判别器D识别生成器G生成的图片为假图片
 with fluid.program_guard(train_d_fake, startup):
@@ -101,15 +101,15 @@ with fluid.program_guard(train_d_fake, startup):
     zeros = fluid.layers.fill_constant_batch_size_like(z, shape=[-1, 1], dtype='float32', value=0)
 
     # 获取损失函数
-    cost = fluid.layers.sigmoid_cross_entropy_with_logits(p_fake, zeros)
-    avg_cost = fluid.layers.mean(cost)
+    fake_cost = fluid.layers.sigmoid_cross_entropy_with_logits(p_fake, zeros)
+    fake_avg_cost = fluid.layers.mean(fake_cost)
 
     # 获取判别器D的参数
     d_params = get_params(train_d_fake, "D")
 
     # 创建优化方法
     optimizer = fluid.optimizer.Adam(learning_rate=0.0002)
-    optimizer.minimize(avg_cost, parameter_list=d_params)
+    optimizer.minimize(fake_avg_cost, parameter_list=d_params)
 
 # 训练生成器G生成符合判别器D标准的假图片
 with fluid.program_guard(train_g, startup):
