@@ -63,7 +63,7 @@ train_g = fluid.Program()
 startup = fluid.Program()
 
 # 噪声维度
-z_dim = 1000
+z_dim = 10
 
 
 # 从Program获取prefix开头的参数名字
