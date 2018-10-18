@@ -173,7 +173,8 @@ mnist_generator = paddle.batch(
 z_generator = paddle.batch(z_reader, batch_size=128)()
 
 # 生成解析器
-place = fluid.CPUPlace()
+# place = fluid.CPUPlace()
+place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
 # 初始化参数
 exe.run(startup)
