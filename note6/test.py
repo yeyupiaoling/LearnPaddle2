@@ -168,7 +168,6 @@ def show_image_grid(images, epoch=None): # images.shape = (64, 1, 28, 28)
         ax.set_yticklabels([])
         ax.set_aspect('equal')
         plt.imshow(image[0], cmap='Greys_r')
-        plt.savefig('test.png')
     plt.show()
 
 
