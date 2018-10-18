@@ -113,24 +113,28 @@ with fluid.program_guard(train_d_fake, startup):
 
 # 训练生成器G生成符合判别器D标准的假图片
 with fluid.program_guard(train_g, startup):
-    # 噪声
+    # 噪声生成图片为真实图片的概率，Label为1
     z = fluid.layers.data(name='z', shape=[z_dim, 1, 1])
     ones = fluid.layers.fill_constant_batch_size_like(z, shape=[-1, 1], dtype='float32', value=1)
 
     # 生成图片
     fake = Generator(z)
+    # 克隆预测程序
     infer_program = train_g.clone(for_test=True)
-    # 生成图片为真实图片的概率，Label为1
+
+    # 生成符合判别器的假图片
     p = Discriminator(fake)
-    # 损失
-    g_loss = fluid.layers.mean(fluid.layers.sigmoid_cross_entropy_with_logits(p, ones))
+
+    # 获取损失函数
+    g_cost = fluid.layers.sigmoid_cross_entropy_with_logits(p, ones)
+    g_avg_cost = fluid.layers.mean(g_cost)
 
     # 获取G的参数
     g_params = get_params(train_g, "G")
 
     # 只训练G
     optimizer = fluid.optimizer.Adam(learning_rate=0.0002)
-    optimizer.minimize(g_loss, parameter_list=g_params)
+    optimizer.minimize(g_avg_cost, parameter_list=g_params)
 
 
 # 噪声生成
@@ -197,7 +201,7 @@ for epoch in range(30):
 
         # 训练生成器G生成符合判别器D标准的假图片
         r_g = exe.run(program=train_g,
-                      fetch_list=[g_loss],
+                      fetch_list=[g_avg_cost],
                       feed={'z': np.array(next(z_generator))})
     print(epoch)
 
