@@ -7,19 +7,17 @@ import matplotlib.pyplot as plt
 # 定义生成器
 def Generator(y, name="G"):
     with fluid.unique_name.guard(name + "/"):
-        y = fluid.layers.fc(y, size=1024, act='tanh')
-        y = fluid.layers.fc(y, size=256 * 7 * 7)
-        y = fluid.layers.batch_norm(y, act='tanh')
-        y = fluid.layers.reshape(y, shape=(-1, 256, 7, 7))
+        y = fluid.layers.fc(y, size=1024, act='relu')
+        # y = fluid.layers.batch_norm(y, act='tanh')
+        y = fluid.layers.fc(y, size=128 * 7 * 7)
+        y = fluid.layers.batch_norm(y, act='relu')
+        y = fluid.layers.reshape(y, shape=(-1, 128, 7, 7))
 
         y = fluid.layers.image_resize(y, scale=2)
-        y = fluid.layers.conv2d(y, num_filters=128, filter_size=5, padding=2, act='tanh')
+        y = fluid.layers.conv2d(y, num_filters=64, filter_size=5, padding=2, act='relu')
 
         y = fluid.layers.image_resize(y, scale=2)
-        y = fluid.layers.conv2d(y, num_filters=64, filter_size=5, padding=2, act='tanh')
-
-        y = fluid.layers.image_resize(y, scale=2)
-        y = fluid.layers.conv2d(y, num_filters=1, filter_size=5, padding=2, act='tanh')
+        y = fluid.layers.conv2d(y, num_filters=1, filter_size=5, padding=2, act='relu')
 
     return y
 
@@ -47,9 +45,6 @@ def Discriminator(images, name="D"):
         y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
 
         y = conv_bn(y, num_filters=128, filter_size=3)
-        y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
-
-        y = conv_bn(y, num_filters=256, filter_size=3)
         y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
 
         y = fluid.layers.fc(y, size=1)
