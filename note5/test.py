@@ -69,7 +69,7 @@ opt = optimizer.minimize(avg_cost)
 
 # 创建一个使用CPU的接解析器
 # place = fluid.CPUPlace()
-place = fluid.CUDAPlace()
+place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())
