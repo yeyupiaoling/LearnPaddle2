@@ -9,8 +9,10 @@ def Generator(y, name="G"):
     with fluid.unique_name.guard(name + "/"):
         y = fluid.layers.fc(y, size=1024, act='relu')
         y = fluid.layers.batch_norm(y, act='relu')
+
         y = fluid.layers.fc(y, size=128 * 7 * 7)
         y = fluid.layers.batch_norm(y, act='relu')
+
         y = fluid.layers.reshape(y, shape=(-1, 128, 7, 7))
 
         y = fluid.layers.image_resize(y, scale=2)
@@ -28,11 +30,9 @@ def Discriminator(images, name="D"):
         y = fluid.layers.conv2d(input=input,
                                 num_filters=num_filters,
                                 filter_size=filter_size,
-                                padding=0,
                                 stride=1,
                                 bias_attr=False)
-        y = fluid.layers.batch_norm(y)
-        y = fluid.layers.leaky_relu(y)
+        y = fluid.layers.batch_norm(y, act="leaky_relu")
         return y
 
     with fluid.unique_name.guard(name + "/"):
