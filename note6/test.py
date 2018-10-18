@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def Generator(y, name="G"):
     with fluid.unique_name.guard(name + "/"):
         y = fluid.layers.fc(y, size=1024, act='relu')
-        # y = fluid.layers.batch_norm(y, act='tanh')
+        y = fluid.layers.batch_norm(y, act='relu')
         y = fluid.layers.fc(y, size=128 * 7 * 7)
         y = fluid.layers.batch_norm(y, act='relu')
         y = fluid.layers.reshape(y, shape=(-1, 128, 7, 7))
