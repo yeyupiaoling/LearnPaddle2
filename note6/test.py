@@ -187,12 +187,12 @@ for epoch in range(30):
     for i, real_image in enumerate(mnist_generator()):
         # 训练判别器D识别真实图片
         r_fake = exe.run(program=train_d_fake,
-                         fetch_list=[avg_cost],
+                         fetch_list=[fake_avg_cost],
                          feed={'z': np.array(next(z_generator))})
 
         # 训练判别器D识别生成器G生成的假图片
         r_real = exe.run(program=train_d_real,
-                         fetch_list=[avg_cost],
+                         fetch_list=[real_avg_cost],
                          feed={'image': np.array(real_image)})
 
         # 训练生成器G生成符合判别器D标准的假图片
