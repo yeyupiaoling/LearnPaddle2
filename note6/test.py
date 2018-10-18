@@ -153,21 +153,20 @@ def mnist_reader(reader):
 
 
 # 显示图片
-def show_image_grid(images, epoch=None):
-    # fig = plt.figure(figsize=(5, 5))
-    # fig.suptitle("Epoch {}".format(epoch))
-    # gs = plt.GridSpec(8, 8)
-    # gs.update(wspace=0.05, hspace=0.05)
+def show_image_grid(images, pass_id=None):
+    fig = plt.figure(figsize=(5, 5))
+    fig.suptitle("Pass {}".format(pass_id))
+    gs = plt.GridSpec(8, 8)
+    gs.update(wspace=0.05, hspace=0.05)
 
     for i, image in enumerate(images[:64]):
-        plt.imsave("test_%d.png" % i, image[0])
-    #     ax = plt.subplot(gs[i])
-    #     plt.axis('off')
-    #     ax.set_xticklabels([])
-    #     ax.set_yticklabels([])
-    #     ax.set_aspect('equal')
-    #     plt.imshow(image[0], cmap='Greys_r')
-    # plt.show()
+        ax = plt.subplot(gs[i])
+        plt.axis('off')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.set_aspect('equal')
+        plt.imshow(image[0], cmap='Greys_r')
+    plt.show()
 
 
 # 生成真实图片reader
@@ -187,7 +186,7 @@ exe.run(startup)
 test_z = np.array(next(z_generator))
 
 # 开始训练
-for epoch in range(30):
+for pass_id in range(20):
     for i, real_image in enumerate(mnist_generator()):
         # 训练判别器D识别真实图片
         r_fake = exe.run(program=train_d_fake,
@@ -203,7 +202,7 @@ for epoch in range(30):
         r_g = exe.run(program=train_g,
                       fetch_list=[g_avg_cost],
                       feed={'z': np.array(next(z_generator))})
-    print(epoch)
+    print("Pass：" + pass_id)
 
     # 测试生成的图片
     r_i = exe.run(program=infer_program,
@@ -211,4 +210,4 @@ for epoch in range(30):
                   feed={'z': test_z})
 
     # 显示生成的图片
-    show_image_grid(r_i[0], epoch)
+    show_image_grid(r_i[0], pass_id)

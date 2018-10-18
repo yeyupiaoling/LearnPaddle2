@@ -108,31 +108,31 @@ for pass_id in range(100):
     test_acc = (sum(test_accs) / len(test_accs))
     print('Test:', pass_id, ', Cost:', test_cost, ', ACC:', test_acc)
 
-# 定义预测数据
-reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
-# 把每个句子拆成一个个单词
-reviews = [c.split() for c in reviews_str]
+    # 定义预测数据
+    reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
+    # 把每个句子拆成一个个单词
+    reviews = [c.split() for c in reviews_str]
 
-# 获取结束符号的标签
-UNK = word_dict['<unk>']
-# 获取每句话对应的标签
-lod = []
-for c in reviews:
-    lod.append([word_dict.get(words, UNK) for words in c])
+    # 获取结束符号的标签
+    UNK = word_dict['<unk>']
+    # 获取每句话对应的标签
+    lod = []
+    for c in reviews:
+        lod.append([word_dict.get(words, UNK) for words in c])
 
-# 获取每句话的单词数量
-base_shape = [[len(c) for c in lod]]
+    # 获取每句话的单词数量
+    base_shape = [[len(c) for c in lod]]
 
-# 生成预测数据
-tensor_words = fluid.create_lod_tensor(lod, base_shape, place)
+    # 生成预测数据
+    tensor_words = fluid.create_lod_tensor(lod, base_shape, place)
 
-# 预测获取预测结果,因为输入的是3个数据，所以要模拟3个label的输入
-results = exe.run(program=test_program,
-                  feed={'words': tensor_words, "label": np.array([[0], [0], [0]]).astype("int64")},
-                  fetch_list=[model])
+    # 预测获取预测结果,因为输入的是3个数据，所以要模拟3个label的输入
+    results = exe.run(program=test_program,
+                      feed={'words': tensor_words, "label": np.array([[0], [0], [0]]).astype("int64")},
+                      fetch_list=[model])
 
-print(results)
+    print(results)
 
-# 打印每句话的正负面概率
-for i, r in enumerate(results[0]):
-    print("\'%s\'的预测结果为：正面概率为：%0.5f，负面概率为：%0.5f" % (reviews_str[i], r[0], r[1]))
+    # 打印每句话的正负面概率
+    for i, r in enumerate(results[0]):
+        print("\'%s\'的预测结果为：正面概率为：%0.5f，负面概率为：%0.5f" % (reviews_str[i], r[0], r[1]))
