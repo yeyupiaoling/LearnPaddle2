@@ -106,7 +106,7 @@ for pass_id in range(100):
     # 计算平均预测损失在和准确率
     test_cost = (sum(test_costs) / len(test_costs))
     test_acc = (sum(test_accs) / len(test_accs))
-    print('Test:%d, Cost:%0.5f, ACC:%0.5f' % (pass_id, test_cost, test_acc))
+    print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc))
 
     # 定义预测数据
     reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
@@ -133,4 +133,4 @@ for pass_id in range(100):
 
     # 打印每句话的正负面概率
     for i, r in enumerate(results[0]):
-        print("\'%s\'的预测结果为：正面概率为：%0.5f，负面概率为：%0.5f" % (reviews_str[i], r[0], r[1]))
+        print("\'%s\'的预测结果为：正面概率为：%0.5f，负面概率为：%0.5f\n" % (reviews_str[i], r[0], r[1]))
