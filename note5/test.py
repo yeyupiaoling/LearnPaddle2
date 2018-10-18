@@ -20,6 +20,7 @@ def rnn_net(ipt, input_dim):
     out = fluid.layers.fc(input=last, size=2, act='softmax')
     return out
 
+
 # 定义长短期记忆网络
 def lstm_net(ipt, input_dim):
     # 以数据的IDs作为输入
@@ -67,16 +68,18 @@ optimizer = fluid.optimizer.Adagrad(learning_rate=0.001)
 opt = optimizer.minimize(avg_cost)
 
 # 创建一个使用CPU的接解析器
-place = fluid.CPUPlace()
+# place = fluid.CPUPlace()
+place = fluid.CUDAPlace()
 exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())
 
 # 获取训练和预测数据
 print("加载训练数据中...")
-train_reader = paddle.batch(imdb.train(word_dict), batch_size=128)
+train_reader = paddle.batch(
+    paddle.reader.shuffle(imdb.train(word_dict), 25000), batch_size=128)
 print("加载测试数据中...")
-test_reader = paddle.batch(imdb.test(word_dict), batch_size=4)
+test_reader = paddle.batch(imdb.test(word_dict), batch_size=128)
 
 # 定义输入数据的维度
 feeder = fluid.DataFeeder(place=place, feed_list=[words, label])
