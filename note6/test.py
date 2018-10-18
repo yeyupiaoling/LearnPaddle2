@@ -20,7 +20,7 @@ def Generator(y, name="G"):
         y = fluid.layers.conv2d(y, num_filters=64, filter_size=5, padding=2, act='relu')
         # 第二组转置卷积运算
         y = fluid.layers.image_resize(y, scale=2)
-        y = fluid.layers.conv2d(y, num_filters=1, filter_size=5, padding=2, act='tanh')
+        y = fluid.layers.conv2d(y, num_filters=1, filter_size=5, padding=2, act='relu')
 
     return y
 
