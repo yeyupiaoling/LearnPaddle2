@@ -95,10 +95,10 @@ with fluid.program_guard(train_d_real, startup):
 with fluid.program_guard(train_d_fake, startup):
     # 利用创建假的图片data，并且label为0
     z = fluid.layers.data(name='z', shape=[z_dim, 1, 1])
-    zeros = fluid.layers.fill_constant_batch_size_like(z, shape=[-1, 1], dtype='float32', value=0)
 
     # 判别器D判断假图片的概率
     p_fake = Discriminator(Generator(z))
+    zeros = fluid.layers.fill_constant_batch_size_like(z, shape=[-1, 1], dtype='float32', value=0)
 
     # 获取损失函数
     cost = fluid.layers.sigmoid_cross_entropy_with_logits(p_fake, zeros)
@@ -115,13 +115,13 @@ with fluid.program_guard(train_d_fake, startup):
 with fluid.program_guard(train_g, startup):
     # 噪声
     z = fluid.layers.data(name='z', shape=[z_dim, 1, 1])
-    ones = fluid.layers.fill_constant_batch_size_like(z, shape=[-1, 1], dtype='float32', value=1)
 
     # 生成图片
     fake = Generator(z)
     infer_program = train_g.clone(for_test=True)
     # 生成图片为真实图片的概率，Label为1
     p = Discriminator(fake)
+    ones = fluid.layers.fill_constant_batch_size_like(z, shape=[-1, 1], dtype='float32', value=1)
     # 损失
     g_loss = fluid.layers.mean(fluid.layers.sigmoid_cross_entropy_with_logits(p, ones))
 
@@ -199,6 +199,7 @@ for epoch in range(30):
         r_g = exe.run(program=train_g,
                       fetch_list=[g_loss],
                       feed={'z': np.array(next(z_generator))})
+    print(epoch)
 
     # 测试生成的图片
     r_i = exe.run(program=infer_program,
