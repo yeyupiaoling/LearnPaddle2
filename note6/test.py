@@ -8,9 +8,12 @@ import matplotlib.pyplot as plt
 def Generator(y, name="G"):
     with fluid.unique_name.guard(name + "/"):
         y = fluid.layers.fc(y, size=1024, act='tanh')
-        y = fluid.layers.fc(y, size=128 * 7 * 7)
+        y = fluid.layers.fc(y, size=256 * 7 * 7)
         y = fluid.layers.batch_norm(y, act='tanh')
-        y = fluid.layers.reshape(y, shape=(-1, 128, 7, 7))
+        y = fluid.layers.reshape(y, shape=(-1, 256, 7, 7))
+
+        y = fluid.layers.image_resize(y, scale=2)
+        y = fluid.layers.conv2d(y, num_filters=128, filter_size=5, padding=2, act='tanh')
 
         y = fluid.layers.image_resize(y, scale=2)
         y = fluid.layers.conv2d(y, num_filters=64, filter_size=5, padding=2, act='tanh')
@@ -24,13 +27,12 @@ def Generator(y, name="G"):
 # 判别器 Discriminator
 def Discriminator(images, name="D"):
     def conv_bn(input, num_filters, filter_size):
-        y = fluid.layers.conv2d(
-            input,
-            num_filters=num_filters,
-            filter_size=filter_size,
-            padding=0,
-            stride=1,
-            bias_attr=False)
+        y = fluid.layers.conv2d(input=input,
+                                num_filters=num_filters,
+                                filter_size=filter_size,
+                                padding=0,
+                                stride=1,
+                                bias_attr=False)
         y = fluid.layers.batch_norm(y)
         y = fluid.layers.leaky_relu(y)
         return y
@@ -45,6 +47,9 @@ def Discriminator(images, name="D"):
         y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
 
         y = conv_bn(y, num_filters=128, filter_size=3)
+        y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
+
+        y = conv_bn(y, num_filters=256, filter_size=3)
         y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
 
         y = fluid.layers.fc(y, size=1)
@@ -172,7 +177,7 @@ def show_image_grid(images, epoch=None):
 
 # 生成真实图片reader
 mnist_generator = paddle.batch(
-    paddle.reader.shuffle(mnist_reader(paddle.dataset.mnist.train()), 1024), batch_size=128)
+    paddle.reader.shuffle(mnist_reader(paddle.dataset.mnist.train()), 30000), batch_size=128)
 # 生成假图片的reader
 z_generator = paddle.batch(z_reader, batch_size=128)()
 
