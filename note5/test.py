@@ -41,6 +41,28 @@ def lstm_net(ipt, input_dim):
     return out
 
 
+def stacked_lstm_net(data, input_dim):
+    emb = fluid.layers.embedding(
+        input=data, size=[input_dim, 128], is_sparse=True)
+
+    fc1 = fluid.layers.fc(input=emb, size=512)
+    lstm1, cell1 = fluid.layers.dynamic_lstm(input=fc1, size=512)
+
+    inputs = [fc1, lstm1]
+
+    for i in range(2, 3 + 1):
+        fc = fluid.layers.fc(input=inputs, size=512)
+        lstm, cell = fluid.layers.dynamic_lstm(
+            input=fc, size=512, is_reverse=(i % 2) == 0)
+        inputs = [fc, lstm]
+
+    fc_last = fluid.layers.sequence_pool(input=inputs[0], pool_type='max')
+    lstm_last = fluid.layers.sequence_pool(input=inputs[1], pool_type='max')
+
+    prediction = fluid.layers.fc(
+        input=[fc_last, lstm_last], size=2, act='softmax')
+    return prediction
+
 # 定义输入数据， lod_level不为0指定输入数据为序列数据
 words = fluid.layers.data(name='words', shape=[1], dtype='int64', lod_level=1)
 label = fluid.layers.data(name='label', shape=[1], dtype='int64')
@@ -52,7 +74,8 @@ word_dict = imdb.word_dict()
 dict_dim = len(word_dict)
 # 获取长短期记忆网络
 # model = lstm_net(words, dict_dim)
-model = rnn_net(words, dict_dim)
+# model = rnn_net(words, dict_dim)
+model = stacked_lstm_net(words, dict_dim)
 
 # 获取损失函数和准确率
 cost = fluid.layers.cross_entropy(input=model, label=label)
@@ -68,8 +91,8 @@ optimizer = fluid.optimizer.Adagrad(learning_rate=0.001)
 opt = optimizer.minimize(avg_cost)
 
 # 创建一个解析器
-# place = fluid.CPUPlace()
-place = fluid.CUDAPlace(0)
+place = fluid.CPUPlace()
+# place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())
