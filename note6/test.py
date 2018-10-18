@@ -156,19 +156,20 @@ def mnist_reader(reader):
 
 # 显示图片
 def show_image_grid(images, pass_id=None):
-    fig = plt.figure(figsize=(5, 5))
-    fig.suptitle("Pass {}".format(pass_id))
-    gs = plt.GridSpec(8, 8)
-    gs.update(wspace=0.05, hspace=0.05)
+    # fig = plt.figure(figsize=(5, 5))
+    # fig.suptitle("Pass {}".format(pass_id))
+    # gs = plt.GridSpec(8, 8)
+    # gs.update(wspace=0.05, hspace=0.05)
 
     for i, image in enumerate(images[:64]):
-        ax = plt.subplot(gs[i])
-        plt.axis('off')
-        ax.set_xticklabels([])
-        ax.set_yticklabels([])
-        ax.set_aspect('equal')
-        plt.imshow(image[0], cmap='Greys_r')
-    plt.show()
+        plt.imsave("test_%d.png" % i, image[0])
+    #     ax = plt.subplot(gs[i])
+    #     plt.axis('off')
+    #     ax.set_xticklabels([])
+    #     ax.set_yticklabels([])
+    #     ax.set_aspect('equal')
+    #     plt.imshow(image[0], cmap='Greys_r')
+    # plt.show()
 
 
 # 生成真实图片reader
