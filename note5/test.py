@@ -129,7 +129,7 @@ for pass_id in range(100):
     # 计算平均预测损失在和准确率
     test_cost = (sum(test_costs) / len(test_costs))
     test_acc = (sum(test_accs) / len(test_accs))
-    print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc))
+    print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc), "cost2:", test_cost)
 
     # 定义预测数据
     reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
