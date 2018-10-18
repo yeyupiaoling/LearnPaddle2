@@ -7,46 +7,48 @@ import matplotlib.pyplot as plt
 # 定义生成器
 def Generator(y, name="G"):
     with fluid.unique_name.guard(name + "/"):
+        # 第一组全连接和BN层
         y = fluid.layers.fc(y, size=1024, act='relu')
         y = fluid.layers.batch_norm(y, act='relu')
-
+        # 第二组全连接和BN层
         y = fluid.layers.fc(y, size=128 * 7 * 7)
         y = fluid.layers.batch_norm(y, act='relu')
-
+        # 进行形状变换
         y = fluid.layers.reshape(y, shape=(-1, 128, 7, 7))
-
+        # 第一组转置卷积运算
         y = fluid.layers.image_resize(y, scale=2)
         y = fluid.layers.conv2d(y, num_filters=64, filter_size=5, padding=2, act='relu')
-
+        # 第二组转置卷积运算
         y = fluid.layers.image_resize(y, scale=2)
-        y = fluid.layers.conv2d(y, num_filters=1, filter_size=5, padding=2, act='relu')
+        y = fluid.layers.conv2d(y, num_filters=1, filter_size=5, padding=2, act='tanh')
 
     return y
 
 
 # 判别器 Discriminator
 def Discriminator(images, name="D"):
+    # 一组卷积层和BN层
     def conv_bn(input, num_filters, filter_size):
         y = fluid.layers.conv2d(input=input,
                                 num_filters=num_filters,
                                 filter_size=filter_size,
                                 stride=1,
                                 bias_attr=False)
+        # 激活函数为leaky ReLU
         y = fluid.layers.batch_norm(y, act="leaky_relu")
         return y
 
     with fluid.unique_name.guard(name + "/"):
-        y = images
-
-        y = conv_bn(y, num_filters=32, filter_size=3)
+        # 第一组卷积池化
+        y = conv_bn(images, num_filters=32, filter_size=3)
         y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
-
+        # 第二组卷积池化
         y = conv_bn(y, num_filters=64, filter_size=3)
         y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
-
+        # 第三组卷积池化
         y = conv_bn(y, num_filters=128, filter_size=3)
         y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
-
+        # 全连接输出层
         y = fluid.layers.fc(y, size=1)
 
     return y
@@ -175,7 +177,7 @@ mnist_generator = paddle.batch(
 # 生成假图片的reader
 z_generator = paddle.batch(z_reader, batch_size=128)()
 
-# 生成解析器
+# 创建解析器
 # place = fluid.CPUPlace()
 place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
@@ -202,7 +204,7 @@ for pass_id in range(20):
         r_g = exe.run(program=train_g,
                       fetch_list=[g_avg_cost],
                       feed={'z': np.array(next(z_generator))})
-    print("Pass：" + pass_id)
+    print("Pass：%d" % pass_id)
 
     # 测试生成的图片
     r_i = exe.run(program=infer_program,

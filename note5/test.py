@@ -67,7 +67,7 @@ test_program = fluid.default_main_program().clone(for_test=True)
 optimizer = fluid.optimizer.Adagrad(learning_rate=0.001)
 opt = optimizer.minimize(avg_cost)
 
-# 创建一个使用CPU的接解析器
+# 创建一个解析器
 # place = fluid.CPUPlace()
 place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
@@ -106,7 +106,7 @@ for pass_id in range(100):
     # 计算平均预测损失在和准确率
     test_cost = (sum(test_costs) / len(test_costs))
     test_acc = (sum(test_accs) / len(test_accs))
-    print('Test:', pass_id, ', Cost:', test_cost, ', ACC:', test_acc)
+    print('Test:%d, Cost:%0.5f, ACC:%0.5f' % (pass_id, test_cost, test_acc))
 
     # 定义预测数据
     reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
@@ -130,8 +130,6 @@ for pass_id in range(100):
     results = exe.run(program=test_program,
                       feed={'words': tensor_words, "label": np.array([[0], [0], [0]]).astype("int64")},
                       fetch_list=[model])
-
-    print(results)
 
     # 打印每句话的正负面概率
     for i, r in enumerate(results[0]):
