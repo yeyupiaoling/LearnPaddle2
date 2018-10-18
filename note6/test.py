@@ -88,7 +88,7 @@ with fluid.program_guard(train_d_real, startup):
     d_params = get_params(train_d_real, "D")
 
     # 创建优化方法
-    optimizer = fluid.optimizer.Adam(learning_rate=0.0002)
+    optimizer = fluid.optimizer.RMSPropOptimizer(learning_rate=0.0002)
     optimizer.minimize(real_avg_cost, parameter_list=d_params)
 
 # 训练判别器D识别生成器G生成的图片为假图片
@@ -108,7 +108,7 @@ with fluid.program_guard(train_d_fake, startup):
     d_params = get_params(train_d_fake, "D")
 
     # 创建优化方法
-    optimizer = fluid.optimizer.Adam(learning_rate=0.0002)
+    optimizer = fluid.optimizer.RMSPropOptimizer(learning_rate=0.0002)
     optimizer.minimize(fake_avg_cost, parameter_list=d_params)
 
 # 训练生成器G生成符合判别器D标准的假图片
@@ -133,7 +133,7 @@ with fluid.program_guard(train_g, startup):
     g_params = get_params(train_g, "G")
 
     # 只训练G
-    optimizer = fluid.optimizer.Adam(learning_rate=0.0002)
+    optimizer = fluid.optimizer.RMSPropOptimizer(learning_rate=0.0002)
     optimizer.minimize(g_avg_cost, parameter_list=g_params)
 
 
