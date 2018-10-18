@@ -131,6 +131,8 @@ results = exe.run(program=test_program,
                   feed={'words': tensor_words, "label": np.array([[0], [0], [0]]).astype("int64")},
                   fetch_list=[model])
 
+print(results)
+
 # 打印每句话的正负面概率
 for i, r in enumerate(results[0]):
     print("\'%s\'的预测结果为：正面概率为：%0.5f，负面概率为：%0.5f" % (reviews_str[i], r[0], r[1]))
