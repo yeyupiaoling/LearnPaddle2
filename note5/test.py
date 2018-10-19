@@ -63,6 +63,7 @@ def stacked_lstm_net(data, input_dim):
         input=[fc_last, lstm_last], size=2, act='softmax')
     return prediction
 
+
 # 定义输入数据， lod_level不为0指定输入数据为序列数据
 words = fluid.layers.data(name='words', shape=[1], dtype='int64', lod_level=1)
 label = fluid.layers.data(name='label', shape=[1], dtype='int64')
@@ -108,7 +109,7 @@ test_reader = paddle.batch(imdb.test(word_dict), batch_size=128)
 feeder = fluid.DataFeeder(place=place, feed_list=[words, label])
 
 # 开始训练
-for pass_id in range(100):
+for pass_id in range(1):
     # 进行训练
     train_cost = 0
     for batch_id, data in enumerate(train_reader()):
@@ -129,7 +130,7 @@ for pass_id in range(100):
     # 计算平均预测损失在和准确率
     test_cost = (sum(test_costs) / len(test_costs))
     test_acc = (sum(test_accs) / len(test_accs))
-    print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc), "cost2:", test_cost)
+    print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc), "ACC2:", test_acc)
 
     # 定义预测数据
     reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
