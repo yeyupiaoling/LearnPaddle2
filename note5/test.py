@@ -107,6 +107,10 @@ for pass_id in range(1):
     test_acc = (sum(test_accs) / len(test_accs))
     print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc), "ACC2:", test_acc)
 
+    fluid.io.save_inference_model("model/", ['words'], [model], exe)
+
+    [inference_program, feed_target_names, fetch_targets] = fluid.io.load_inference_model("model/", exe)
+
     # 定义预测数据
     reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
     # 把每个句子拆成一个个单词
@@ -126,9 +130,9 @@ for pass_id in range(1):
     tensor_words = fluid.create_lod_tensor(lod, base_shape, place)
 
     # 预测获取预测结果,因为输入的是3个数据，所以要模拟3个label的输入
-    results = exe.run(program=test_program,
-                      feed={'words': tensor_words, "label": np.array([[0], [0], [0]]).astype("int64")},
-                      fetch_list=[model])
+    results = exe.run(program=inference_program,
+                      feed={feed_target_names[0]: tensor_words},
+                      fetch_list=feed_target_names)
 
     # 打印每句话的正负面概率
     for i, r in enumerate(results[0]):
