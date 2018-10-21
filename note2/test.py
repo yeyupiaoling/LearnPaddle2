@@ -14,7 +14,11 @@ exe = fluid.executor.Executor(place)
 exe.run(fluid.default_main_program())
 
 # 进行运算，并把y的结果输出
+# result = exe.run(program=fluid.default_main_program(),
+#                  fetch_list=[y])
+# 输出计算结果
+# print("1+1 =", result[0][0])
+
+
 result = exe.run(program=fluid.default_main_program(),
                  fetch_list=[y])
-# 输出计算结果
-print("1+1 =", result[0][0])

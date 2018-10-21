@@ -11,8 +11,8 @@ def rnn_net(ipt, input_dim):
     rnn = fluid.layers.DynamicRNN()
     with rnn.block():
         word = rnn.step_input(sentence)
-        prev = rnn.memory(shape=[512])
-        hidden = fluid.layers.fc(input=[word, prev], size=512, act='relu')
+        prev = rnn.memory(shape=[128])
+        hidden = fluid.layers.fc(input=[word, prev], size=128, act='relu')
         rnn.update_memory(prev, hidden)
         rnn.output(hidden)
 
