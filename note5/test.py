@@ -83,6 +83,35 @@ test_reader = paddle.batch(imdb.test(word_dict), batch_size=128)
 # 定义输入数据的维度
 feeder = fluid.DataFeeder(place=place, feed_list=[words, label])
 
+[inference_program, feed_target_names, fetch_targets] = fluid.io.load_inference_model("model/", exe)
+
+# 定义预测数据
+reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
+# 把每个句子拆成一个个单词
+reviews = [c.split() for c in reviews_str]
+
+# 获取结束符号的标签
+UNK = word_dict['<unk>']
+# 获取每句话对应的标签
+lod = []
+for c in reviews:
+    lod.append([word_dict.get(words, UNK) for words in c])
+
+# 获取每句话的单词数量
+base_shape = [[len(c) for c in lod]]
+
+# 生成预测数据
+tensor_words = fluid.create_lod_tensor(lod, base_shape, place)
+
+# 预测获取预测结果,因为输入的是3个数据，所以要模拟3个label的输入
+results = exe.run(program=inference_program,
+                  feed={feed_target_names[0]: tensor_words},
+                  fetch_list=fetch_targets)
+
+# 打印每句话的正负面概率
+for i, r in enumerate(results[0]):
+    print("\'%s\'的预测结果为：正面概率为：%0.5f，负面概率为：%0.5f" % (reviews_str[i], r[0], r[1]))
+
 # 开始训练
 for pass_id in range(1):
     # 进行训练
@@ -105,7 +134,7 @@ for pass_id in range(1):
     # 计算平均预测损失在和准确率
     test_cost = (sum(test_costs) / len(test_costs))
     test_acc = (sum(test_accs) / len(test_accs))
-    print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc), "ACC2:", test_acc)
+    print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc))
 
     fluid.io.save_inference_model("model/", ['words'], [model], exe)
 
@@ -132,8 +161,8 @@ for pass_id in range(1):
     # 预测获取预测结果,因为输入的是3个数据，所以要模拟3个label的输入
     results = exe.run(program=inference_program,
                       feed={feed_target_names[0]: tensor_words},
-                      fetch_list=feed_target_names)
+                      fetch_list=fetch_targets)
 
     # 打印每句话的正负面概率
     for i, r in enumerate(results[0]):
-        print("\'%s\'的预测结果为：正面概率为：%0.5f，负面概率为：%0.5f\n" % (reviews_str[i], r[0], r[1]))
+        print("\'%s\'的预测结果为：正面概率为：%0.5f，负面概率为：%0.5f" % (reviews_str[i], r[0], r[1]))
