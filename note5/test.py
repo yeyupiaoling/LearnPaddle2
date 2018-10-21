@@ -64,7 +64,7 @@ train_program = fluid.default_main_program()
 test_program = fluid.default_main_program().clone(for_test=True)
 
 # 定义优化方法
-optimizer = fluid.optimizer.Adagrad(learning_rate=0.001)
+optimizer = fluid.optimizer.Adagrad(learning_rate=0.002)
 opt = optimizer.minimize(avg_cost)
 
 # 创建一个解析器
