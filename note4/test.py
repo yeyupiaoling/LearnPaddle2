@@ -62,7 +62,6 @@ acc = fluid.layers.accuracy(input=model, label=label)
 
 # 获取训练和测试程序
 test_program = fluid.default_main_program().clone(for_test=True)
-train_program = fluid.default_main_program()
 
 # 定义优化方法
 optimizer = fluid.optimizer.AdamOptimizer(learning_rate=0.001)
@@ -85,7 +84,7 @@ feeder = fluid.DataFeeder(place=place, feed_list=[image, label])
 for pass_id in range(10):
     # 进行训练
     for batch_id, data in enumerate(train_reader()):
-        train_cost, train_acc = exe.run(program=train_program,
+        train_cost, train_acc = exe.run(program=fluid.default_main_program(),
                                         feed=feeder.feed(data),
                                         fetch_list=[avg_cost, acc])
         # 每100个batch打印一次信息

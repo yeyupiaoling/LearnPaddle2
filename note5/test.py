@@ -59,8 +59,7 @@ cost = fluid.layers.cross_entropy(input=model, label=label)
 avg_cost = fluid.layers.mean(cost)
 acc = fluid.layers.accuracy(input=model, label=label)
 
-# 获取训练和预测程序
-train_program = fluid.default_main_program()
+# 获取预测程序
 test_program = fluid.default_main_program().clone(for_test=True)
 
 # 定义优化方法
@@ -89,7 +88,7 @@ for pass_id in range(1):
     # 进行训练
     train_cost = 0
     for batch_id, data in enumerate(train_reader()):
-        train_cost = exe.run(program=train_program,
+        train_cost = exe.run(program=fluid.default_main_program(),
                              feed=feeder.feed(data),
                              fetch_list=[cost])
     print('Pass:%d, Cost:%0.5f' % (pass_id, train_cost[0][0]))
