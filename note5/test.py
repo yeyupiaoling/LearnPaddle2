@@ -91,21 +91,22 @@ for pass_id in range(1):
         train_cost = exe.run(program=fluid.default_main_program(),
                              feed=feeder.feed(data),
                              fetch_list=[cost])
-    print('Pass:%d, Cost:%0.5f' % (pass_id, train_cost[0][0]))
 
-    # 进行测试
-    test_costs = []
-    test_accs = []
-    for batch_id, data in enumerate(test_reader()):
-        test_cost, test_acc = exe.run(program=test_program,
-                                      feed=feeder.feed(data),
-                                      fetch_list=[cost, acc])
-        test_costs.append(test_cost[0][0])
-        test_accs.append(test_acc[0])
-    # 计算平均预测损失在和准确率
-    test_cost = (sum(test_costs) / len(test_costs))
-    test_acc = (sum(test_accs) / len(test_accs))
-    print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc))
+        if batch_id % 10 == 0:
+            print('Pass:%d, Batch:%d, Cost:%0.5f' % (pass_id, batch_id, train_cost[0][0]))
+            # 进行测试
+            test_costs = []
+            test_accs = []
+            for batch_id, data in enumerate(test_reader()):
+                test_cost, test_acc = exe.run(program=test_program,
+                                              feed=feeder.feed(data),
+                                              fetch_list=[cost, acc])
+                test_costs.append(test_cost[0][0])
+                test_accs.append(test_acc[0])
+            # 计算平均预测损失在和准确率
+            test_cost = (sum(test_costs) / len(test_costs))
+            test_acc = (sum(test_accs) / len(test_accs))
+            print('Test:%d, Cost:%0.5f, ACC:%0.5f\n' % (pass_id, test_cost, test_acc))
 
     # 定义预测数据
     reviews_str = ['read the book forget the movie', 'this is a great movie', 'this is very bad']
