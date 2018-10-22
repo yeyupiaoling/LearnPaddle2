@@ -51,8 +51,8 @@ word_dict = imdb.word_dict()
 # 获取数据字典长度
 dict_dim = len(word_dict)
 # 获取长短期记忆网络
-# model = lstm_net(words, dict_dim)
-model = rnn_net(words, dict_dim)
+model = lstm_net(words, dict_dim)
+# model = rnn_net(words, dict_dim)
 
 # 获取损失函数和准确率
 cost = fluid.layers.cross_entropy(input=model, label=label)
@@ -92,7 +92,7 @@ for pass_id in range(1):
                              feed=feeder.feed(data),
                              fetch_list=[cost])
 
-        if batch_id % 10 == 0:
+        if batch_id % 20 == 0:
             print('Pass:%d, Batch:%d, Cost:%0.5f' % (pass_id, batch_id, train_cost[0][0]))
             # 进行测试
             test_costs = []
