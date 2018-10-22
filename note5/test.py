@@ -6,13 +6,13 @@ import numpy as np
 
 def rnn_net(ipt, input_dim):
     emb = fluid.layers.embedding(input=ipt, size=[input_dim, 128], is_sparse=True)
-    sentence = fluid.layers.fc(input=emb, size=128, act='tanh')
+    sentence = fluid.layers.fc(input=emb, size=512, act='tanh')
 
     rnn = fluid.layers.DynamicRNN()
     with rnn.block():
         word = rnn.step_input(sentence)
-        prev = rnn.memory(shape=[128])
-        hidden = fluid.layers.fc(input=[word, prev], size=128, act='relu')
+        prev = rnn.memory(shape=[512])
+        hidden = fluid.layers.fc(input=[word, prev], size=512, act='relu')
         rnn.update_memory(prev, hidden)
         rnn.output(hidden)
 
@@ -27,9 +27,9 @@ def lstm_net(ipt, input_dim):
     emb = fluid.layers.embedding(input=ipt, size=[input_dim, 128], is_sparse=True)
 
     # 第一个全连接层
-    fc1 = fluid.layers.fc(input=emb, size=128)
+    fc1 = fluid.layers.fc(input=emb, size=512)
     # 进行一个长短期记忆操作
-    lstm1, _ = fluid.layers.dynamic_lstm(input=fc1, size=128)
+    lstm1, _ = fluid.layers.dynamic_lstm(input=fc1, size=512)
 
     # 第一个最大序列池操作
     fc2 = fluid.layers.sequence_pool(input=fc1, pool_type='max')
@@ -119,7 +119,6 @@ for pass_id in range(1):
     for c in reviews:
         # 需要把单词进行字符串编码转换
         lod.append([word_dict.get(words.encode('utf-8'), UNK) for words in c])
-    print(lod)
 
     # 获取每句话的单词数量
     base_shape = [[len(c) for c in lod]]
