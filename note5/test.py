@@ -67,8 +67,8 @@ optimizer = fluid.optimizer.AdagradOptimizer(learning_rate=0.002)
 opt = optimizer.minimize(avg_cost)
 
 # 创建一个解析器
-# place = fluid.CPUPlace()
-place = fluid.CUDAPlace(0)
+place = fluid.CPUPlace()
+# place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())
@@ -100,7 +100,7 @@ for pass_id in range(1):
             for batch_id, data in enumerate(test_reader()):
                 test_cost, test_acc = exe.run(program=test_program,
                                               feed=feeder.feed(data),
-                                              fetch_list=[cost, acc])
+                                              fetch_list=[avg_cost, acc])
                 test_costs.append(test_cost[0][0])
                 test_accs.append(test_acc[0])
             # 计算平均预测损失在和准确率
