@@ -120,6 +120,3 @@ results = exe.run(program=test_program,
                   feed={'image': img, "label": np.array([[1]]).astype("int64")},
                   fetch_list=[model])
 
-# 获取概率最大的label
-lab = np.argsort(results)
-print("该图片的预测结果的label为: %d" % lab[0][0][-1])
