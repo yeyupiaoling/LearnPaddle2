@@ -47,7 +47,7 @@ def convolutional_neural_network(input):
     return fc
 
 
-# 定义输出层
+# 定义输入层
 image = fluid.layers.data(name='image', shape=[1, 28, 28], dtype='float32')
 label = fluid.layers.data(name='label', shape=[1], dtype='int64')
 
