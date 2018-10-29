@@ -90,10 +90,10 @@ for pass_id in range(1):
     for batch_id, data in enumerate(train_reader()):
         train_cost = exe.run(program=fluid.default_main_program(),
                              feed=feeder.feed(data),
-                             fetch_list=[cost])
+                             fetch_list=[avg_cost])
 
         if batch_id % 20 == 0:
-            print('Pass:%d, Batch:%d, Cost:%0.5f' % (pass_id, batch_id, train_cost[0][0]))
+            print('Pass:%d, Batch:%d, Cost:%0.5f' % (pass_id, batch_id, train_cost[0]))
             # 进行测试
             test_costs = []
             test_accs = []
@@ -101,7 +101,7 @@ for pass_id in range(1):
                 test_cost, test_acc = exe.run(program=test_program,
                                               feed=feeder.feed(data),
                                               fetch_list=[avg_cost, acc])
-                test_costs.append(test_cost[0][0])
+                test_costs.append(test_cost[0])
                 test_accs.append(test_acc[0])
             # 计算平均预测损失在和准确率
             test_cost = (sum(test_costs) / len(test_costs))
