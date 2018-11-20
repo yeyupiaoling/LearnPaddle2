@@ -189,7 +189,7 @@ exe.run(startup)
 test_z = np.array(next(z_generator))
 
 # 开始训练
-for pass_id in range(20):
+for pass_id in range(5):
     for i, real_image in enumerate(mnist_generator()):
         # 训练判别器D识别真实图片
         r_fake = exe.run(program=train_d_fake,
