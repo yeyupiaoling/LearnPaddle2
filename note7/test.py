@@ -47,7 +47,7 @@ exe.run(fluid.default_startup_program())
 for pass_id in range(500):
     state = env.reset()
     for t in range(490):
-        #         env.render()
+        # env.render()
         if random.random() < 0.01:
             state = np.expand_dims(state, axis=0)
             action = env.action_space.sample()
