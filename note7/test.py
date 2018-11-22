@@ -6,8 +6,8 @@ from collections import deque
 
 
 def QNetWork(ipt):
-    fc1 = fluid.layers.fc(input=ipt, size=512, act='relu')
-    fc3 = fluid.layers.fc(input=fc1, size=512, act='relu')
+    fc1 = fluid.layers.fc(input=ipt, size=1024, act='relu')
+    fc3 = fluid.layers.fc(input=fc1, size=4096, act='relu')
     out = fluid.layers.fc(input=fc3, size=2)
     return out
 
@@ -19,7 +19,7 @@ next_state_data = fluid.layers.data(name='next_state', shape=[4], dtype='float32
 done_data = fluid.layers.data(name='done', shape=[], dtype='bool')
 
 batch_size = 32
-num_episodes = 35
+num_episodes = 350
 num_exploration_episodes = 100
 max_len_episode = 1000
 learning_rate = 1e-3
