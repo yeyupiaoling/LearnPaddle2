@@ -6,12 +6,15 @@ import os
 from multiprocessing import cpu_count
 import matplotlib.pyplot as plt
 
+# 获取原图像所在的目录
 data_path = './TibetanMnist（350x350）'
 data_imgs = os.listdir(data_path)
 
+# 生成图像列表，每张图像对应一个label
 with open('./train_data.list', 'w') as f_train:
     with open('./test_data.list', 'w') as f_test:
         for i in range(len(data_imgs)):
+            # 去除可能存在的其他文本文件
             if data_imgs[i] == 'lable.txt':
                 continue
             if i % 10 == 0:
@@ -21,6 +24,7 @@ with open('./train_data.list', 'w') as f_train:
         print('图像列表已生成。')
 
 
+# 定义训练的mapper
 def train_mapper(sample):
     img, label = sample
     img = paddle.dataset.image.load_image(file=img, is_color=False)
@@ -29,6 +33,7 @@ def train_mapper(sample):
     return img, label
 
 
+# 定义训练的reader
 def train_r(train_list_path):
     def reader():
         with open(train_list_path, 'r') as f:
@@ -41,6 +46,7 @@ def train_r(train_list_path):
     return paddle.reader.xmap_readers(train_mapper, reader, cpu_count(), 1024)
 
 
+# 定义测试的mapper
 def test_mapper(sample):
     img, label = sample
     img = paddle.dataset.image.load_image(file=img, is_color=False)
@@ -49,6 +55,7 @@ def test_mapper(sample):
     return img, label
 
 
+# 定义测试的reader
 def test_r(test_list_path):
     def reader():
         with open(test_list_path, 'r') as f:
@@ -60,6 +67,7 @@ def test_r(test_list_path):
     return paddle.reader.xmap_readers(test_mapper, reader, cpu_count(), 1024)
 
 
+# 定义一个卷积神经网络
 def cnn(ipt):
     conv1 = fluid.layers.conv2d(input=ipt,
                                 num_filters=32,
@@ -99,30 +107,41 @@ def cnn(ipt):
 
     return fc2
 
+
+# 获取网络的分类器
 image = fluid.layers.data(name='image', shape=[1, 28, 28], dtype='float32')
 net = cnn(image)
 
+# 定义损失函数和准确率函数
 label = fluid.layers.data(name='label', shape=[1], dtype='int64')
 cost = fluid.layers.cross_entropy(input=net, label=label)
 avg_cost = fluid.layers.mean(x=cost)
 acc = fluid.layers.accuracy(input=net, label=label, k=1)
 
+# 克隆测试程序
 test_program = fluid.default_main_program().clone(for_test=True)
 
+# 定义优化方法
 optimizer = fluid.optimizer.AdamOptimizer(learning_rate=0.001)
 opt = optimizer.minimize(avg_cost)
 
+# 定义执行器
 place = fluid.CPUPlace()
 exe = fluid.Executor(place=place)
 exe.run(program=fluid.default_startup_program())
 
-train_reader = paddle.batch(reader=paddle.reader.shuffle(reader=train_r('./train_data.list'), buf_size=3000), batch_size=128)
+# 生成训练和测试的reader
+train_reader = paddle.batch(reader=paddle.reader.shuffle(reader=train_r('./train_data.list'), buf_size=3000),
+                            batch_size=128)
 test_reader = paddle.batch(reader=test_r('./test_data.list'), batch_size=128)
 
+# 定义输入数据的维度
 feeder = fluid.DataFeeder(place=place, feed_list=[image, label])
 
+# 开始训练和测试
 for pass_id in range(2):
     for batch_id, data in enumerate(train_reader()):
+        # 执行训练程序
         train_cost, train_acc = exe.run(program=fluid.default_main_program(),
                                         feed=feeder.feed(data),
                                         fetch_list=[avg_cost, acc])
@@ -131,6 +150,7 @@ for pass_id in range(2):
         else:
             print('.', end="")
 
+    # 执行测试程序
     test_costs = []
     test_accs = []
     for batch_id, data in enumerate(test_reader()):
@@ -143,25 +163,33 @@ for pass_id in range(2):
     test_acc = sum(test_accs) / len(test_accs)
     print('\nTest：%d, Cost：%f, Accuracy：%f' % (pass_id, test_cost, test_acc))
 
+    # 保存模型
     fluid.io.save_inference_model(dirname='./model', feeded_var_names=['image'], target_vars=[net], executor=exe)
 
+# 从保存的模型中获取预测程序、feed名称和网络分类器
 [infer_program, feeded_var_names, target_vars] = fluid.io.load_inference_model(dirname='./model', executor=exe)
 
+
+# 预处理图片
 def load_image(path):
     img = paddle.dataset.image.load_image(file=path, is_color=False)
     img = paddle.dataset.image.simple_transform(im=img, resize_size=32, crop_size=28, is_color=False, is_train=False)
     img = img.astype('float32')
-    img = img[np.newaxis, ] / 255.0
+    img = img[np.newaxis,] / 255.0
     return img
 
+
+# 把处理后的图片加入到列表中
 infer_imgs = []
 infer_imgs.append(load_image('./TibetanMnist（350x350）/0_10_398.jpg'))
 infer_imgs = np.array(infer_imgs)
 
+# 执行预测程序
 result = exe.run(program=infer_program,
-                 feed={feeded_var_names[0]:infer_imgs},
+                 feed={feeded_var_names[0]: infer_imgs},
                  fetch_list=target_vars)
 
+# 显示图片并输出结果最大的label
 lab = np.argsort(result)
 
 im = Image.open('./TibetanMnist（350x350）/0_10_398.jpg')
@@ -169,6 +197,3 @@ plt.imshow(im)
 plt.show()
 
 print('预测结果为：%d' % lab[0][0][-1])
-
-
-

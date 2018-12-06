@@ -16,7 +16,7 @@ PaddlePaddle新版本Fluid教程，使用的PaddlePaddle版本为1.0.2，Python�
  10. PaddlePaddle从入门到炼丹十——VisulDL可视化
 
 ## 额外文章
- 1. 额外篇一 自定义图像数据集识别
+ 1. PaddlePaddle从入门到炼丹 额外篇一——自定义图像数据集识别
  
  
 # 同步其他平台
