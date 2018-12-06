@@ -5,19 +5,21 @@ import gym
 from collections import deque
 
 
+# 定义一个深度神经网络
 def QNetWork(ipt):
     fc1 = fluid.layers.fc(input=ipt, size=1024, act='relu')
     fc3 = fluid.layers.fc(input=fc1, size=4096, act='relu')
     out = fluid.layers.fc(input=fc3, size=2)
     return out
 
-
+# 定义输入数据
 state_data = fluid.layers.data(name='state', shape=[4], dtype='float32')
 action_data = fluid.layers.data(name='action', shape=[1], dtype='int64')
 reward_data = fluid.layers.data(name='reward', shape=[], dtype='float32')
 next_state_data = fluid.layers.data(name='next_state', shape=[4], dtype='float32')
 done_data = fluid.layers.data(name='done', shape=[], dtype='bool')
 
+# 定义训练的参数
 batch_size = 32
 num_episodes = 350
 num_exploration_episodes = 100
@@ -26,11 +28,17 @@ learning_rate = 1e-3
 gamma = 1.0
 initial_epsilon = 1.0
 final_epsilon = 0.01
+
+# 获取游戏
 env = gym.make("CartPole-v1")
 replay_buffer = deque(maxlen=10000)
+
+# 获取网络
 state_model = QNetWork(state_data)
 
+# 克隆预测程序
 predict_program = fluid.default_main_program().clone()
+
 
 action_onehot = fluid.layers.one_hot(action_data, 2)
 action_onehot = fluid.layers.cast(action_onehot, dtype='float32')
