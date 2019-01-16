@@ -84,6 +84,7 @@ exe.run(fluid.default_startup_program())
 # 加载之前训练过的参数模型
 save_path = 'models/params_model/'
 if os.path.exists(save_path):
+    print('使用参数模型作为预训练模型')
     fluid.io.load_params(executor=exe, dirname=save_path)
 
 # 定义输入数据维度

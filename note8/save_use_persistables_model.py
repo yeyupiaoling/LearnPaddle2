@@ -81,9 +81,10 @@ exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())
 
-# 加载之前训练过的参数模型
-save_path = 'models/params_model/'
+# 加载之前训练过的检查点模型
+save_path = 'models/persistables_model/'
 if os.path.exists(save_path):
+    print('使用检查点模型作为预训练模型')
     fluid.io.load_persistables(executor=exe, dirname=save_path)
 
 # 定义输入数据维度
@@ -116,10 +117,10 @@ for pass_id in range(10):
     print('Test:%d, Cost:%0.5f, Accuracy:%0.5f' % (pass_id, test_cost, test_acc))
 
     # 保存参数模型
-    save_path = 'models/params_model/'
+    save_path = 'models/persistables_model/'
     # 删除旧的模型文件
     shutil.rmtree(save_path, ignore_errors=True)
     # 创建保持模型文件目录
     os.makedirs(save_path)
-    # 保存参数模型
+    # 保存检查点模型
     fluid.io.save_persistables(executor=exe, dirname=save_path)
