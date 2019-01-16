@@ -7,12 +7,12 @@ from multiprocessing import cpu_count
 import matplotlib.pyplot as plt
 
 # 获取原图像所在的目录
-data_path = './TibetanMnist（350x350）'
+data_path = 'TibetanMnist'
 data_imgs = os.listdir(data_path)
 
 # 生成图像列表，每张图像对应一个label
-with open('./train_data.list', 'w') as f_train:
-    with open('./test_data.list', 'w') as f_test:
+with open('train_data.list', 'w') as f_train:
+    with open('test_data.list', 'w') as f_test:
         for i in range(len(data_imgs)):
             # 去除可能存在的其他文本文件
             if data_imgs[i] == 'lable.txt':
@@ -126,7 +126,7 @@ optimizer = fluid.optimizer.AdamOptimizer(learning_rate=0.001)
 opt = optimizer.minimize(avg_cost)
 
 # 定义执行器
-place = fluid.CPUPlace()
+place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place=place)
 exe.run(program=fluid.default_startup_program())
 
@@ -139,7 +139,7 @@ test_reader = paddle.batch(reader=test_r('./test_data.list'), batch_size=128)
 feeder = fluid.DataFeeder(place=place, feed_list=[image, label])
 
 # 开始训练和测试
-for pass_id in range(2):
+for pass_id in range(20):
     for batch_id, data in enumerate(train_reader()):
         # 执行训练程序
         train_cost, train_acc = exe.run(program=fluid.default_main_program(),
@@ -175,13 +175,13 @@ def load_image(path):
     img = paddle.dataset.image.load_image(file=path, is_color=False)
     img = paddle.dataset.image.simple_transform(im=img, resize_size=32, crop_size=28, is_color=False, is_train=False)
     img = img.astype('float32')
-    img = img[np.newaxis,] / 255.0
+    img = img[np.newaxis, ] / 255.0
     return img
 
 
 # 把处理后的图片加入到列表中
 infer_imgs = []
-infer_imgs.append(load_image('./TibetanMnist（350x350）/0_10_398.jpg'))
+infer_imgs.append(load_image('TibetanMnist/0_15_1083.jpg'))
 infer_imgs = np.array(infer_imgs)
 
 # 执行预测程序
@@ -192,7 +192,8 @@ result = exe.run(program=infer_program,
 # 显示图片并输出结果最大的label
 lab = np.argsort(result)
 
-im = Image.open('./TibetanMnist（350x350）/0_10_398.jpg')
+# 显示图片仅在jupyter上可用
+im = Image.open('TibetanMnist/0_15_1083.jpg')
 plt.imshow(im)
 plt.show()
 
