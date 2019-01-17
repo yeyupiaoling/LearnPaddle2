@@ -6,21 +6,30 @@ import matplotlib.pyplot as plt
 
 # 定义生成器
 def Generator(y, name="G"):
+    def deconv(x, num_filters, filter_size=5, stride=2, dilation=1, padding=2, output_size=None, act=None):
+        return fluid.layers.conv2d_transpose(input=x,
+                                             num_filters=num_filters,
+                                             output_size=output_size,
+                                             filter_size=filter_size,
+                                             stride=stride,
+                                             dilation=dilation,
+                                             padding=padding,
+                                             act=act)
     with fluid.unique_name.guard(name + "/"):
         # 第一组全连接和BN层
-        y = fluid.layers.fc(y, size=1024, act='relu')
-        y = fluid.layers.batch_norm(y, act='relu')
+        y = fluid.layers.fc(y, size=2048)
+        y = fluid.layers.batch_norm(y)
         # 第二组全连接和BN层
         y = fluid.layers.fc(y, size=128 * 7 * 7)
-        y = fluid.layers.batch_norm(y, act='relu')
+        y = fluid.layers.batch_norm(y)
         # 进行形状变换
         y = fluid.layers.reshape(y, shape=(-1, 128, 7, 7))
         # 第一组转置卷积运算
-        y = fluid.layers.image_resize(y, scale=2)
-        y = fluid.layers.conv2d(y, num_filters=64, filter_size=5, padding=2, act='relu')
+        y = deconv(x=y, num_filters=128, act='relu', output_size=[14, 14])
         # 第二组转置卷积运算
-        y = fluid.layers.image_resize(y, scale=2)
-        y = fluid.layers.conv2d(y, num_filters=1, filter_size=5, padding=2, act='relu')
+        y = deconv(x=y, num_filters=1, act='tanh', output_size=[28, 28])
+
+        # y = fluid.layers.reshape(x=y, shape=[-1, 28 * 28])
 
     return y
 
@@ -28,29 +37,26 @@ def Generator(y, name="G"):
 # 判别器 Discriminator
 def Discriminator(images, name="D"):
     # 一组卷积层和BN层
-    def conv_bn(input, num_filters, filter_size):
-        y = fluid.layers.conv2d(input=input,
-                                num_filters=num_filters,
-                                filter_size=filter_size,
-                                stride=1,
-                                bias_attr=False)
-        # 激活函数为leaky ReLU
-        y = fluid.layers.batch_norm(y, act="leaky_relu")
-        return y
+    def conv_pool(input, num_filters, act=None):
+        return fluid.nets.simple_img_conv_pool(input=input,
+                                               filter_size=5,
+                                               num_filters=num_filters,
+                                               pool_size=2,
+                                               pool_stride=2,
+                                               act=act)
 
     with fluid.unique_name.guard(name + "/"):
-        # 第一组卷积池化
-        y = conv_bn(images, num_filters=32, filter_size=3)
-        y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
-        # 第二组卷积池化
-        y = conv_bn(y, num_filters=64, filter_size=3)
-        y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
-        # 第三组卷积池化
-        y = conv_bn(y, num_filters=128, filter_size=3)
-        y = fluid.layers.pool2d(y, pool_size=2, pool_stride=2)
-        # 全连接输出层
-        y = fluid.layers.fc(y, size=1)
+        y = fluid.layers.reshape(x=images, shape=[-1, 1, 28, 28])
 
+        y = conv_pool(input=y, num_filters=64, act='leaky_relu')
+
+        y = conv_pool(input=y, num_filters=128)
+        y = fluid.layers.batch_norm(input=y, act='leaky_relu')
+
+        y = fluid.layers.fc(input=y, size=1024)
+        y = fluid.layers.batch_norm(input=y, act='leaky_relu')
+
+        y = fluid.layers.fc(input=y, size=1, act='sigmoid')
     return y
 
 
@@ -162,6 +168,7 @@ def show_image_grid(images, pass_id=None):
     # gs.update(wspace=0.05, hspace=0.05)
 
     for i, image in enumerate(images[:64]):
+        # 保存生成的图片
         plt.imsave("image/test_%d.png" % i, image[0])
     #     ax = plt.subplot(gs[i])
     #     plt.axis('off')
@@ -179,8 +186,8 @@ mnist_generator = paddle.batch(
 z_generator = paddle.batch(z_reader, batch_size=128)()
 
 # 创建解析器，最好使用GPU，CPU速度太慢了
-place = fluid.CPUPlace()
-# place = fluid.CUDAPlace(0)
+# place = fluid.CPUPlace()
+place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
 # 初始化参数
 exe.run(startup)
@@ -189,7 +196,7 @@ exe.run(startup)
 test_z = np.array(next(z_generator))
 
 # 开始训练
-for pass_id in range(5):
+for pass_id in range(20):
     for i, real_image in enumerate(mnist_generator()):
         # 训练判别器D识别真实图片
         r_fake = exe.run(program=train_d_fake,
