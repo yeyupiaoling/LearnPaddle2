@@ -6,50 +6,32 @@ import paddle.dataset.cifar as cifar
 import paddle.fluid as fluid
 
 
-# 定义残差神经网络（ResNet）
-def resnet_cifar10(ipt, class_dim):
-    def conv_bn_layer(input,
-                      ch_out,
-                      filter_size,
-                      stride,
-                      padding,
-                      act='relu',
-                      bias_attr=False):
-        tmp = fluid.layers.conv2d(
-            input=input,
-            filter_size=filter_size,
-            num_filters=ch_out,
-            stride=stride,
-            padding=padding,
-            bias_attr=bias_attr)
-        return fluid.layers.batch_norm(input=tmp, act=act)
+# 定义VGG16神经网络
+def vgg16(input, class_dim=1000):
+    def conv_block(conv, num_filter, groups):
+        for i in range(groups):
+            conv = fluid.layers.conv2d(input=conv,
+                                       num_filters=num_filter,
+                                       filter_size=3,
+                                       stride=1,
+                                       padding=1,
+                                       act='relu')
+        return fluid.layers.pool2d(input=conv, pool_size=2, pool_type='max', pool_stride=2)
 
-    def shortcut(input, ch_in, ch_out, stride):
-        if ch_in != ch_out:
-            return conv_bn_layer(input, ch_out, 1, stride, 0, None)
-        else:
-            return input
+    conv1 = conv_block(input, 64, 2)
+    conv2 = conv_block(conv1, 128, 2)
+    conv3 = conv_block(conv2, 256, 3)
+    conv4 = conv_block(conv3, 512, 3)
+    conv5 = conv_block(conv4, 512, 3)
 
-    def basicblock(input, ch_in, ch_out, stride):
-        tmp = conv_bn_layer(input, ch_out, 3, stride, 1)
-        tmp = conv_bn_layer(tmp, ch_out, 3, 1, 1, act=None, bias_attr=True)
-        short = shortcut(input, ch_in, ch_out, stride)
-        return fluid.layers.elementwise_add(x=tmp, y=short, act='relu')
+    fc1 = fluid.layers.fc(input=conv5, size=512)
+    dp1 = fluid.layers.dropout(x=fc1, dropout_prob=0.5)
+    fc2 = fluid.layers.fc(input=dp1, size=512)
+    bn1 = fluid.layers.batch_norm(input=fc2, act='relu')
+    fc2 = fluid.layers.dropout(x=bn1, dropout_prob=0.5)
+    out = fluid.layers.fc(input=fc2, size=class_dim, act='softmax')
 
-    # 残差块
-    def layer_warp(block_func, input, ch_in, ch_out, count, stride):
-        tmp = block_func(input, ch_in, ch_out, stride)
-        for i in range(1, count):
-            tmp = block_func(tmp, ch_out, ch_out, 1)
-        return tmp
-
-    conv1 = conv_bn_layer(ipt, ch_out=16, filter_size=3, stride=1, padding=1)
-    res1 = layer_warp(basicblock, conv1, 16, 16, 5, 1)
-    res2 = layer_warp(basicblock, res1, 16, 32, 5, 2)
-    res3 = layer_warp(basicblock, res2, 32, 64, 5, 2)
-    pool = fluid.layers.pool2d(input=res3, pool_size=8, pool_type='avg', pool_stride=1)
-    predict = fluid.layers.fc(input=pool, size=class_dim, act='softmax')
-    return predict
+    return out
 
 
 # 定义输入层
@@ -57,7 +39,7 @@ image = fluid.layers.data(name='image', shape=[3, 32, 32], dtype='float32')
 label = fluid.layers.data(name='label', shape=[1], dtype='int64')
 
 # 获取分类器
-model = resnet_cifar10(image, 10)
+model = vgg16(image, 10)
 
 # 获取损失函数和准确率函数
 cost = fluid.layers.cross_entropy(input=model, label=label)
@@ -68,15 +50,16 @@ acc = fluid.layers.accuracy(input=model, label=label)
 test_program = fluid.default_main_program().clone(for_test=True)
 
 # 定义优化方法
-optimizer = fluid.optimizer.AdamOptimizer(learning_rate=0.001)
+optimizer = fluid.optimizer.AdamOptimizer(learning_rate=1e-3)
 opts = optimizer.minimize(avg_cost)
 
 # 获取MNIST数据
-train_reader = paddle.batch(cifar.train10(), batch_size=64)
-test_reader = paddle.batch(cifar.test10(), batch_size=64)
+train_reader = paddle.batch(cifar.train10(), batch_size=32)
+test_reader = paddle.batch(cifar.test10(), batch_size=32)
 
 # 定义一个使用CPU的解析器
 place = fluid.CUDAPlace(0)
+# place = fluid.CPUPlace()
 exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())

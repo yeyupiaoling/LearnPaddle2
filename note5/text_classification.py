@@ -66,7 +66,7 @@ test_program = fluid.default_main_program().clone(for_test=True)
 optimizer = fluid.optimizer.AdagradOptimizer(learning_rate=0.002)
 opt = optimizer.minimize(avg_cost)
 
-# 创建一个解析器
+# 创建一个解析器，CPU训练速度比较慢
 place = fluid.CPUPlace()
 # place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)

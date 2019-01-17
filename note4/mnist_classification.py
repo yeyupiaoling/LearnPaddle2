@@ -106,6 +106,7 @@ for pass_id in range(10):
     test_acc = (sum(test_accs) / len(test_accs))
     print('Test:%d, Cost:%0.5f, Accuracy:%0.5f' % (pass_id, test_cost, test_acc))
 
+
 # 对图片进行预处理
 def load_image(file):
     im = Image.open(file).convert('L')
@@ -114,9 +115,12 @@ def load_image(file):
     im = im / 255.0 * 2.0 - 1.0
     return im
 
+
 # 加载数据并开始预测
-img = load_image('./infer_3.png')
+img = load_image('image/infer_3.png')
 results = exe.run(program=test_program,
                   feed={'image': img, "label": np.array([[1]]).astype("int64")},
                   fetch_list=[model])
-
+# 获取概率最大的标签
+lab = np.argsort(results)[0][0][-1]
+print('infer_3.png infer result: %d' % lab)

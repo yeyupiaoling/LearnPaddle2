@@ -162,7 +162,7 @@ def show_image_grid(images, pass_id=None):
     # gs.update(wspace=0.05, hspace=0.05)
 
     for i, image in enumerate(images[:64]):
-        plt.imsave("test_%d.png" % i, image[0])
+        plt.imsave("image/test_%d.png" % i, image[0])
     #     ax = plt.subplot(gs[i])
     #     plt.axis('off')
     #     ax.set_xticklabels([])
@@ -178,9 +178,9 @@ mnist_generator = paddle.batch(
 # 生成假图片的reader
 z_generator = paddle.batch(z_reader, batch_size=128)()
 
-# 创建解析器
-# place = fluid.CPUPlace()
-place = fluid.CUDAPlace(0)
+# 创建解析器，最好使用GPU，CPU速度太慢了
+place = fluid.CPUPlace()
+# place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
 # 初始化参数
 exe.run(startup)
