@@ -1,13 +1,13 @@
-import os
-import shutil
+import mobilenet_v2
 import paddle as paddle
 import paddle.dataset.cifar as cifar
 import paddle.fluid as fluid
-import mobilenet_v2
 from visualdl import LogWriter
 
+# 创建记录器
 log_writer = LogWriter(dir='log/', sync_cycle=10)
 
+# 创建训练和测试记录数据工具
 with log_writer.mode('train') as writer:
     train_cost_writer = writer.scalar('cost')
     train_acc_writer = writer.scalar('accuracy')
