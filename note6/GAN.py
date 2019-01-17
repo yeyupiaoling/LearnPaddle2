@@ -28,15 +28,12 @@ def Generator(y, name="G"):
         y = deconv(x=y, num_filters=128, act='relu', output_size=[14, 14])
         # 第二组转置卷积运算
         y = deconv(x=y, num_filters=1, act='tanh', output_size=[28, 28])
-
-        # y = fluid.layers.reshape(x=y, shape=[-1, 28 * 28])
-
     return y
 
 
 # 判别器 Discriminator
 def Discriminator(images, name="D"):
-    # 一组卷积层和BN层
+    # 定义一个卷积池化组
     def conv_pool(input, num_filters, act=None):
         return fluid.nets.simple_img_conv_pool(input=input,
                                                filter_size=5,
@@ -47,15 +44,15 @@ def Discriminator(images, name="D"):
 
     with fluid.unique_name.guard(name + "/"):
         y = fluid.layers.reshape(x=images, shape=[-1, 1, 28, 28])
-
+        # 第一个卷积池化组
         y = conv_pool(input=y, num_filters=64, act='leaky_relu')
-
+        # 第一个卷积池化加回归层
         y = conv_pool(input=y, num_filters=128)
         y = fluid.layers.batch_norm(input=y, act='leaky_relu')
-
+        # 第二个卷积池化加回归层
         y = fluid.layers.fc(input=y, size=1024)
         y = fluid.layers.batch_norm(input=y, act='leaky_relu')
-
+        # 最后一个分类器输出
         y = fluid.layers.fc(input=y, size=1, act='sigmoid')
     return y
 
@@ -170,6 +167,7 @@ def show_image_grid(images, pass_id=None):
     for i, image in enumerate(images[:64]):
         # 保存生成的图片
         plt.imsave("image/test_%d.png" % i, image[0])
+    # 以下代码在jupyter可用
     #     ax = plt.subplot(gs[i])
     #     plt.axis('off')
     #     ax.set_xticklabels([])
