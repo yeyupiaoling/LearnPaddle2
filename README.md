@@ -12,10 +12,12 @@ PaddlePaddle新版本Fluid教程，使用的PaddlePaddle版本为1.2.0，Python�
  6. [PaddlePaddle从入门到炼丹六——生成对抗网络](https://blog.csdn.net/qq_33200967/article/details/83714930)
  7. [PaddlePaddle从入门到炼丹七——强化学习](https://blog.csdn.net/qq_33200967/article/details/86505106)
  8. [PaddlePaddle从入门到炼丹八——模型的保存与使用](https://blog.csdn.net/qq_33200967/article/details/86516515)
- 9. [PaddlePaddle从入门到炼丹九——迁移学习]()
- 10. [PaddlePaddle从入门到炼丹十——VisulDL可视化]()
+ 9. [PaddlePaddle从入门到炼丹九——迁移学习](https://blog.csdn.net/qq_33200967/article/details/86532750)
+ 10. [PaddlePaddle从入门到炼丹十——VisulDL可视化](https://blog.csdn.net/qq_33200967/article/details/86532831)
 
 ## 额外文章
  1. [PaddlePaddle从入门到炼丹 额外篇一——自定义图像数据集识别](https://blog.csdn.net/qq_33200967/article/details/84847519)
  
  
+# 补充
+来都来了，觉得不错的话，给个star吧。
