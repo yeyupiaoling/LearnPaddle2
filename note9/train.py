@@ -98,7 +98,7 @@ test_program = fluid.default_main_program().clone(for_test=True)
 optimizer = fluid.optimizer.AdamOptimizer(learning_rate=1e-3)
 opts = optimizer.minimize(avg_cost)
 
-# 获取MNIST数据
+# 获取花卉数据
 train_reader = paddle.batch(flowers.train(), batch_size=16)
 test_reader = paddle.batch(flowers.test(), batch_size=16)
 

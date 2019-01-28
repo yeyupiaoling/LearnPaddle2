@@ -53,7 +53,7 @@ test_program = fluid.default_main_program().clone(for_test=True)
 optimizer = fluid.optimizer.AdamOptimizer(learning_rate=1e-3)
 opts = optimizer.minimize(avg_cost)
 
-# 获取MNIST数据
+# 获取CIFAR数据
 train_reader = paddle.batch(cifar.train10(), batch_size=32)
 test_reader = paddle.batch(cifar.test10(), batch_size=32)
 
