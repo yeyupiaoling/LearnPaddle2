@@ -109,7 +109,7 @@ exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())
 
-# 官方提供的原预训练模型
+# 经过处理的预训练预训练模型
 pretrained_model_path = 'models/pretrain_model/'
 
 # 加载经过处理的模型
