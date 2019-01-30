@@ -8,7 +8,7 @@ b = fluid.layers.create_tensor(dtype='int64', name='b')
 # 将两个张量求和
 y = fluid.layers.sum(x=[a, b])
 
-# 创建一个使用CPU的解释器
+# 创建一个使用CPU的执行器
 place = fluid.CPUPlace()
 exe = fluid.executor.Executor(place)
 # 进行参数初始化

@@ -40,7 +40,7 @@ opts = optimizer.minimize(avg_cost)
 train_reader = paddle.batch(cifar.train10(), batch_size=32)
 test_reader = paddle.batch(cifar.test10(), batch_size=32)
 
-# 定义一个使用CPU的解析器
+# 定义一个使用CPU的执行器
 place = fluid.CUDAPlace(0)
 # place = fluid.CPUPlace()
 exe = fluid.Executor(place)

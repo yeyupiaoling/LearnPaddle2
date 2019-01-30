@@ -7,7 +7,7 @@ x2 = fluid.layers.fill_constant(shape=[2, 2], value=1, dtype='int64')
 # 将两个张量求和
 y1 = fluid.layers.sum(x=[x1, x2])
 
-# 创建一个使用CPU的解释器
+# 创建一个使用CPU的执行器
 place = fluid.CPUPlace()
 exe = fluid.executor.Executor(place)
 # 进行参数初始化

@@ -20,7 +20,7 @@ test_program = fluid.default_main_program().clone(for_test=True)
 optimizer = fluid.optimizer.SGDOptimizer(learning_rate=0.01)
 opts = optimizer.minimize(avg_cost)
 
-# 创建一个使用CPU的解释器
+# 创建一个使用CPU的执行器
 place = fluid.CPUPlace()
 exe = fluid.Executor(place)
 # 进行参数初始化
