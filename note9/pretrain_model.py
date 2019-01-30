@@ -104,7 +104,7 @@ opts = optimizer.minimize(avg_cost)
 # 获取flowers数据
 train_reader = paddle.batch(flowers.train(), batch_size=16)
 
-# 定义一个使用CPU的解析器
+# 定义一个使用GPU的执行器
 place = fluid.CUDAPlace(0)
 # place = fluid.CPUPlace()
 exe = fluid.Executor(place)
