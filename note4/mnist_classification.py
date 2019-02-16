@@ -71,7 +71,7 @@ opts = optimizer.minimize(avg_cost)
 train_reader = paddle.batch(mnist.train(), batch_size=128)
 test_reader = paddle.batch(mnist.test(), batch_size=128)
 
-# 定义一个使用CPU的解析器
+# 定义一个使用CPU的执行器
 place = fluid.CPUPlace()
 exe = fluid.Executor(place)
 # 进行参数初始化

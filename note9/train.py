@@ -98,18 +98,18 @@ test_program = fluid.default_main_program().clone(for_test=True)
 optimizer = fluid.optimizer.AdamOptimizer(learning_rate=1e-3)
 opts = optimizer.minimize(avg_cost)
 
-# 获取MNIST数据
+# 获取花卉数据
 train_reader = paddle.batch(flowers.train(), batch_size=16)
 test_reader = paddle.batch(flowers.test(), batch_size=16)
 
-# 定义一个使用CPU的解析器
+# 定义一个使用GPU的执行器
 place = fluid.CUDAPlace(0)
 # place = fluid.CPUPlace()
 exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())
 
-# 官方提供的原预训练模型
+# 经过处理的预训练预训练模型
 pretrained_model_path = 'models/pretrain_model/'
 
 # 加载经过处理的模型

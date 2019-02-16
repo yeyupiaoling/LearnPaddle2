@@ -97,17 +97,14 @@ cost = fluid.layers.cross_entropy(input=model, label=label)
 avg_cost = fluid.layers.mean(cost)
 acc = fluid.layers.accuracy(input=model, label=label)
 
-# 获取训练和测试程序
-test_program = fluid.default_main_program().clone(for_test=True)
-
 # 定义优化方法
 optimizer = fluid.optimizer.AdamOptimizer(learning_rate=1e-3)
 opts = optimizer.minimize(avg_cost)
 
-# 获取MNIST数据
+# 获取flowers数据
 train_reader = paddle.batch(flowers.train(), batch_size=16)
 
-# 定义一个使用CPU的解析器
+# 定义一个使用GPU的执行器
 place = fluid.CUDAPlace(0)
 # place = fluid.CPUPlace()
 exe = fluid.Executor(place)
