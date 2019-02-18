@@ -1,3 +1,5 @@
+import os
+
 import requests
 import json
 import time
@@ -61,16 +63,18 @@ def get_data(tup):
 def get_routine():
     global downloaded_sum
     # 从文件中读取已经有的数据，避免数据重复
-    with open('news_classify_data.txt', 'r', encoding='utf-8') as fp:
-        lines = fp.readlines()
-        downloaded_sum = len(lines)
-        for line in lines:
-            item_id = int(line.split('_!_')[0])
-            downloaded_data_id.append(item_id)
-        print('在文件中已经读起了%d条数据' % downloaded_sum)
+    data_path = 'news_classify_data.txt'
+    if os.path.exists(data_path):
+        with open(data_path, 'r', encoding='utf-8') as fp:
+            lines = fp.readlines()
+            downloaded_sum = len(lines)
+            for line in lines:
+                item_id = int(line.split('_!_')[0])
+                downloaded_data_id.append(item_id)
+            print('在文件中已经读起了%d条数据' % downloaded_sum)
 
     while 1:
-        time.sleep(10)
+        time.sleep(100)
         for tp in g_cnns:
             get_data(tp)
 
