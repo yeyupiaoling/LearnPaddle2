@@ -6,7 +6,7 @@ import json
 import time
 
 # 分类新闻参数
-g_cnns = [
+news_classify = [
     [0, '民生', 'news_story'],
     [1, '文化', 'news_culture'],
     [2, '娱乐', 'news_entertainment'],
@@ -30,7 +30,7 @@ downloaded_data_id = []
 downloaded_sum = 0
 
 
-def get_data(tup):
+def get_data(tup, data_path):
     global downloaded_data_id
     global downloaded_sum
     print('============%s============' % tup[1])
@@ -38,7 +38,8 @@ def get_data(tup):
     # 分类新闻的访问参数
     t = int(time.time() / 10000)
     t = random.randint(6 * t, 10 * t)
-    querystring = {"category": tup[2], "max_behot_time": t, "last_refresh_sub_entrance_interval": "1524907088", "loc_mode": "5",
+    querystring = {"category": tup[2], "max_behot_time": t, "last_refresh_sub_entrance_interval": "1524907088",
+                   "loc_mode": "5",
                    "tt_from": "pre_load_more", "cp": "51a5ee4f38c50q1", "plugin_enable": "0", "iid": "31047425023",
                    "device_id": "51425358841", "ac": "wifi", "channel": "tengxun", "aid": "13",
                    "app_name": "news_article", "version_code": "631", "version_name": "6.3.1",
@@ -60,7 +61,7 @@ def get_data(tup):
     response = requests.request("GET", url, headers=headers, params=querystring)
     # 获取返回的数据
     new_data = json.loads(response.text)
-    with open('datasets/news_classify_data.txt', 'a', encoding='utf-8') as fp:
+    with open(data_path, 'a', encoding='utf-8') as fp:
         for item in new_data['data']:
             item = item['content']
             item = item.replace('\"', '"')
@@ -80,10 +81,9 @@ def get_data(tup):
                     downloaded_sum += 1
 
 
-def get_routine():
+def get_routine(data_path):
     global downloaded_sum
     # 从文件中读取已经有的数据，避免数据重复
-    data_path = 'datasets/news_classify_data.txt'
     if os.path.exists(data_path):
         with open(data_path, 'r', encoding='utf-8') as fp:
             lines = fp.readlines()
@@ -96,13 +96,38 @@ def get_routine():
         os.makedirs(os.path.dirname(data_path))
 
     while 1:
-        time.sleep(100)
-        for tp in g_cnns:
-            get_data(tp)
+        time.sleep(10)
+        for classify in news_classify:
+            get_data(classify, data_path)
 
         if downloaded_sum >= 400000:
             break
 
 
+def create_dict(data_path, dict_path):
+    dict_set = set()
+
+    with open(data_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    for line in lines:
+        title = line.split('_!_')[-1].replace('\n', '')
+        for s in title:
+            dict_set.add(s)
+
+    dict_list = []
+    i = 0
+    for s in dict_set:
+        dict_list.append([s, i])
+        i += 1
+
+    with open(dict_path, 'w', encoding='utf-8') as f:
+        f.write(str(dict(dict_list)))
+
+
 if __name__ == '__main__':
-    get_routine()
+    data_path = 'datasets/news_classify_data.txt'
+    dict_path = "datasets/dict_txt.txt"
+
+    get_routine(data_path)
+    create_dict(data_path, dict_path)
