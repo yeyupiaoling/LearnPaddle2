@@ -1,4 +1,5 @@
 import os
+import random
 
 import requests
 import json
@@ -35,12 +36,14 @@ def get_data(tup):
     print('============%s============' % tup[1])
     url = "http://it.snssdk.com/api/news/feed/v63/"
     # 分类新闻的访问参数
-    querystring = {"category": tup[2]}
+    t = int(time.time() / 10000)
+    t = random.randint(6 * t, 10 * t)
+    querystring = {"category": tup[2], "max_behot_time": t}
     # 进行网络请求
     response = requests.request("GET", url, params=querystring)
     # 获取返回的数据
     new_data = json.loads(response.text)
-    with open('news_classify_data.txt', 'a', encoding='utf-8') as fp:
+    with open('datasets/news_classify_data.txt', 'a', encoding='utf-8') as fp:
         for item in new_data['data']:
             item = item['content']
             item = item.replace('\"', '"')
@@ -63,7 +66,7 @@ def get_data(tup):
 def get_routine():
     global downloaded_sum
     # 从文件中读取已经有的数据，避免数据重复
-    data_path = 'news_classify_data.txt'
+    data_path = 'datasets/news_classify_data.txt'
     if os.path.exists(data_path):
         with open(data_path, 'r', encoding='utf-8') as fp:
             lines = fp.readlines()
@@ -72,6 +75,8 @@ def get_routine():
                 item_id = int(line.split('_!_')[0])
                 downloaded_data_id.append(item_id)
             print('在文件中已经读起了%d条数据' % downloaded_sum)
+    else:
+        os.makedirs(os.path.dirname(data_path))
 
     while 1:
         time.sleep(100)
