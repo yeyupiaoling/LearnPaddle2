@@ -8,33 +8,36 @@ from PIL import Image
 
 # 训练图片的预处理
 def train_mapper(sample):
-    img, label, crop_size, resize_size = sample
-    img = Image.open(img)
-    # 统一图片大小
-    img = img.resize((resize_size, resize_size), Image.ANTIALIAS)
-    # 随机水平翻转
-    r1 = random.random()
-    if r1 > 0.5:
-        img = img.transpose(Image.FLIP_LEFT_RIGHT)
-    # 随机垂直翻转
-    r2 = random.random()
-    if r2 > 0.5:
-        img = img.transpose(Image.FLIP_TOP_BOTTOM)
-    # 随机角度翻转
-    r3 = random.randint(-3, 3)
-    img = img.rotate(r3, expand=False)
-    # 随机裁剪
-    r4 = random.randint(0, int(resize_size - crop_size))
-    r5 = random.randint(0, int(resize_size - crop_size))
-    box = (r4, r5, r4 + crop_size, r5 + crop_size)
-    img = img.crop(box)
-    # 把图片转换成numpy值
-    img = np.array(img).astype(np.float32)
-    # 转换成CHW
-    img = img.transpose((2, 0, 1))
-    # 转换成BGR
-    img = img[(2, 1, 0), :, :] / 255.0
-    return img, int(label)
+    img_path, label, crop_size, resize_size = sample
+    try:
+        img = Image.open(img_path)
+        # 统一图片大小
+        img = img.resize((resize_size, resize_size), Image.ANTIALIAS)
+        # 随机水平翻转
+        r1 = random.random()
+        if r1 > 0.5:
+            img = img.transpose(Image.FLIP_LEFT_RIGHT)
+        # 随机垂直翻转
+        r2 = random.random()
+        if r2 > 0.5:
+            img = img.transpose(Image.FLIP_TOP_BOTTOM)
+        # 随机角度翻转
+        r3 = random.randint(-3, 3)
+        img = img.rotate(r3, expand=False)
+        # 随机裁剪
+        r4 = random.randint(0, int(resize_size - crop_size))
+        r5 = random.randint(0, int(resize_size - crop_size))
+        box = (r4, r5, r4 + crop_size, r5 + crop_size)
+        img = img.crop(box)
+        # 把图片转换成numpy值
+        img = np.array(img).astype(np.float32)
+        # 转换成CHW
+        img = img.transpose((2, 0, 1))
+        # 转换成BGR
+        img = img[(2, 1, 0), :, :] / 255.0
+        return img, int(label)
+    except:
+        print("%s 该图片错误，请删除该图片并重新创建图像数据列表" % img_path)
 
 
 # 获取训练的reader
