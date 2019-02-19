@@ -35,7 +35,7 @@ def get_data(tup, data_path):
     global downloaded_sum
     print('============%s============' % tup[1])
     url = "http://it.snssdk.com/api/news/feed/v63/"
-    # 分类新闻的访问参数
+    # 分类新闻的访问参数，模仿正常网络访问
     t = int(time.time() / 10000)
     t = random.randint(6 * t, 10 * t)
     querystring = {"category": tup[2], "max_behot_time": t, "last_refresh_sub_entrance_interval": "1524907088",
@@ -96,34 +96,13 @@ def get_routine(data_path):
         os.makedirs(os.path.dirname(data_path))
 
     while 1:
-        #　开始下载数据
+        # 　开始下载数据
         time.sleep(10)
         for classify in news_classify:
             get_data(classify, data_path)
         # 当下载量超过300000就停止下载
         if downloaded_sum >= 300000:
             break
-
-# 把下载得数据生成一个字典
-def create_dict(data_path, dict_path):
-    dict_set = set()
-    # 读取已经下载得数据
-    with open(data_path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    # 把数据生成一个元组
-    for line in lines:
-        title = line.split('_!_')[-1].replace('\n', '')
-        for s in title:
-            dict_set.add(s)
-    # 把元组转换成字典，一个字对应一个数字
-    dict_list = []
-    i = 0
-    for s in dict_set:
-        dict_list.append([s, i])
-        i += 1
-    # 把这些字典保存到本地中
-    with open(dict_path, 'w', encoding='utf-8') as f:
-        f.write(str(dict(dict_list)))
 
 
 if __name__ == '__main__':
