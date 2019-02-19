@@ -32,7 +32,6 @@ def get_data(sentence):
 data = []
 # 获取图片数据
 data1 = get_data('京城最值得你来场文化之旅的博物馆')
-print(data1)
 data2 = get_data('谢娜为李浩菲澄清网络谣言，之后她的两个行为给自己加分')
 data.append(data1)
 data.append(data2)
