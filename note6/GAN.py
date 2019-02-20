@@ -15,6 +15,7 @@ def Generator(y, name="G"):
                                              dilation=dilation,
                                              padding=padding,
                                              act=act)
+
     with fluid.unique_name.guard(name + "/"):
         # 第一组全连接和BN层
         y = fluid.layers.fc(y, size=2048)
@@ -145,7 +146,7 @@ with fluid.program_guard(train_g, startup):
 # 噪声生成
 def z_reader():
     while True:
-        yield np.random.normal(-1.0, 1.0, (z_dim)).astype('float32')
+        yield np.random.uniform(-1.0, 1.0, (z_dim)).astype('float32')
 
 
 # 读取MNIST数据集，不使用label
@@ -157,24 +158,11 @@ def mnist_reader(reader):
     return r
 
 
-# 显示图片
-def show_image_grid(images, pass_id=None):
-    # fig = plt.figure(figsize=(5, 5))
-    # fig.suptitle("Pass {}".format(pass_id))
-    # gs = plt.GridSpec(8, 8)
-    # gs.update(wspace=0.05, hspace=0.05)
-
+# 保存图片
+def show_image_grid(images):
     for i, image in enumerate(images[:64]):
-        # 保存生成的图片
-        plt.imsave("image/test_%d.png" % i, image[0])
-    # 以下代码在jupyter可用
-    #     ax = plt.subplot(gs[i])
-    #     plt.axis('off')
-    #     ax.set_xticklabels([])
-    #     ax.set_yticklabels([])
-    #     ax.set_aspect('equal')
-    #     plt.imshow(image[0], cmap='Greys_r')
-    # plt.show()
+        image = image[0]
+        plt.imsave("image/test_%d.png" % i, image, cmap='Greys_r')
 
 
 # 生成真实图片reader
@@ -210,7 +198,11 @@ for pass_id in range(20):
         r_g = exe.run(program=train_g,
                       fetch_list=[g_avg_cost],
                       feed={'z': test_z})
-    print("Pass：%d" % pass_id)
+
+        if i % 100 == 0:
+            print("Pass：%d, Batch：%d, 训练判别器D识别真实图片Cost：%0.5f, "
+                  "训练判别器D识别生成器G生成的假图片Cost：%0.5f, "
+                  "训练生成器G生成符合判别器D标准的假图片Cost：%0.5f" % (pass_id, i, r_fake[0], r_real[0], r_g[0]))
 
     # 测试生成的图片
     r_i = exe.run(program=infer_program,
@@ -218,4 +210,4 @@ for pass_id in range(20):
                   feed={'z': test_z})
 
     # 显示生成的图片
-    show_image_grid(r_i[0], pass_id)
+    show_image_grid(r_i[0])
