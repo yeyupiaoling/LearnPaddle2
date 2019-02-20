@@ -15,19 +15,20 @@ def Generator(y, name="G"):
                                              dilation=dilation,
                                              padding=padding,
                                              act=act)
+
     with fluid.unique_name.guard(name + "/"):
         # 第一组全连接和BN层
         y = fluid.layers.fc(y, size=2048)
         y = fluid.layers.batch_norm(y)
         # 第二组全连接和BN层
-        y = fluid.layers.fc(y, size=128 * 7 * 7)
+        y = fluid.layers.fc(y, size=128 * 8 * 8)
         y = fluid.layers.batch_norm(y)
         # 进行形状变换
-        y = fluid.layers.reshape(y, shape=(-1, 128, 7, 7))
+        y = fluid.layers.reshape(y, shape=(-1, 128, 8, 8))
         # 第一组转置卷积运算
-        y = deconv(x=y, num_filters=128, act='relu', output_size=[14, 14])
+        y = deconv(x=y, num_filters=128, act='relu', output_size=[16, 16])
         # 第二组转置卷积运算
-        y = deconv(x=y, num_filters=1, act='tanh', output_size=[28, 28])
+        y = deconv(x=y, num_filters=3, act='tanh', output_size=[32, 32])
     return y
 
 
@@ -43,7 +44,7 @@ def Discriminator(images, name="D"):
                                                act=act)
 
     with fluid.unique_name.guard(name + "/"):
-        y = fluid.layers.reshape(x=images, shape=[-1, 1, 28, 28])
+        y = fluid.layers.reshape(x=images, shape=[-1, 3, 32, 32])
         # 第一个卷积池化组
         y = conv_pool(input=y, num_filters=64, act='leaky_relu')
         # 第一个卷积池化加回归层
@@ -80,7 +81,7 @@ def get_params(program, prefix):
 # 训练判别器D识别真实图片
 with fluid.program_guard(train_d_real, startup):
     # 创建读取真实数据集图片的data，并且label为1
-    real_image = fluid.layers.data('image', shape=[1, 28, 28])
+    real_image = fluid.layers.data('image', shape=[3, 32, 32])
     ones = fluid.layers.fill_constant_batch_size_like(real_image, shape=[-1, 1], dtype='float32', value=1)
 
     # 判别器D判断真实图片的概率
@@ -148,38 +149,24 @@ def z_reader():
         yield np.random.normal(-1.0, 1.0, (z_dim)).astype('float32')
 
 
-# 读取MNIST数据集，不使用label
-def mnist_reader(reader):
+# 读取cifar数据集，不使用label
+def cifar_reader(reader):
     def r():
         for img, label in reader():
-            yield img.reshape(1, 28, 28)
+            yield img.reshape(3, 32, 32)
 
     return r
 
 
-# 显示图片
-def show_image_grid(images, pass_id=None):
-    # fig = plt.figure(figsize=(5, 5))
-    # fig.suptitle("Pass {}".format(pass_id))
-    # gs = plt.GridSpec(8, 8)
-    # gs.update(wspace=0.05, hspace=0.05)
-
+# 保存图片
+def show_image_grid(images):
     for i, image in enumerate(images[:64]):
         # 保存生成的图片
         plt.imsave("image/test_%d.png" % i, image[0])
-    # 以下代码在jupyter可用
-    #     ax = plt.subplot(gs[i])
-    #     plt.axis('off')
-    #     ax.set_xticklabels([])
-    #     ax.set_yticklabels([])
-    #     ax.set_aspect('equal')
-    #     plt.imshow(image[0], cmap='Greys_r')
-    # plt.show()
 
 
 # 生成真实图片reader
-mnist_generator = paddle.batch(
-    paddle.reader.shuffle(mnist_reader(paddle.dataset.mnist.train()), 30000), batch_size=128)
+mnist_generator = paddle.batch(reader=cifar_reader(paddle.dataset.cifar.train10()), batch_size=128)
 # 生成假图片的reader
 z_generator = paddle.batch(z_reader, batch_size=128)()
 
@@ -218,4 +205,4 @@ for pass_id in range(20):
                   feed={'z': test_z})
 
     # 显示生成的图片
-    show_image_grid(r_i[0], pass_id)
+    show_image_grid(r_i[0])
