@@ -2,7 +2,9 @@ import numpy as np
 import paddle
 import paddle.fluid as fluid
 import matplotlib.pyplot as plt
+import image_reader
 
+image_size = 224
 
 # 定义生成器
 def Generator(y, name="G"):
@@ -28,7 +30,7 @@ def Generator(y, name="G"):
         # 第一组转置卷积运算
         y = deconv(x=y, num_filters=128, act='relu', output_size=[16, 16])
         # 第二组转置卷积运算
-        y = deconv(x=y, num_filters=3, act='tanh', output_size=[32, 32])
+        y = deconv(x=y, num_filters=3, act='sigmoid', output_size=[image_size, image_size])
     return y
 
 
@@ -37,14 +39,14 @@ def Discriminator(images, name="D"):
     # 定义一个卷积池化组
     def conv_pool(input, num_filters, act=None):
         return fluid.nets.simple_img_conv_pool(input=input,
-                                               filter_size=5,
+                                               filter_size=3,
                                                num_filters=num_filters,
                                                pool_size=2,
                                                pool_stride=2,
                                                act=act)
 
     with fluid.unique_name.guard(name + "/"):
-        y = fluid.layers.reshape(x=images, shape=[-1, 3, 32, 32])
+        y = fluid.layers.reshape(x=images, shape=[-1, 3, image_size, image_size])
         # 第一个卷积池化组
         y = conv_pool(input=y, num_filters=64, act='leaky_relu')
         # 第一个卷积池化加回归层
@@ -81,7 +83,7 @@ def get_params(program, prefix):
 # 训练判别器D识别真实图片
 with fluid.program_guard(train_d_real, startup):
     # 创建读取真实数据集图片的data，并且label为1
-    real_image = fluid.layers.data('image', shape=[3, 32, 32])
+    real_image = fluid.layers.data('image', shape=[3, image_size, image_size])
     ones = fluid.layers.fill_constant_batch_size_like(real_image, shape=[-1, 1], dtype='float32', value=1)
 
     # 判别器D判断真实图片的概率
@@ -161,13 +163,12 @@ def cifar_reader(reader):
 # 保存图片
 def show_image_grid(images):
     for i, image in enumerate(images[:64]):
-        # image = (image + 1) / 2
         image = image.transpose((2, 1, 0))
         plt.imsave("image/test_%d.png" % i, image)
 
 
 # 生成真实图片reader
-mnist_generator = paddle.batch(reader=cifar_reader(paddle.dataset.cifar.train10()), batch_size=128)
+mydata_generator = paddle.batch(reader=image_reader.train_reader('datasets', image_size), batch_size=128)
 # 生成假图片的reader
 z_generator = paddle.batch(z_reader, batch_size=128)()
 
@@ -182,8 +183,8 @@ exe.run(startup)
 test_z = np.array(next(z_generator))
 
 # 开始训练
-for pass_id in range(20):
-    for i, real_image in enumerate(mnist_generator()):
+for pass_id in range(100):
+    for i, real_image in enumerate(mydata_generator()):
         # 训练判别器D识别真实图片
         r_fake = exe.run(program=train_d_fake,
                          fetch_list=[fake_avg_cost],
