@@ -1,10 +1,13 @@
+import os
+import shutil
 import numpy as np
 import paddle
 import paddle.fluid as fluid
 import matplotlib.pyplot as plt
 import image_reader
 
-image_size = 224
+# 训练的图片大小
+image_size = 112
 
 # 定义生成器
 def Generator(y, name="G"):
@@ -23,12 +26,12 @@ def Generator(y, name="G"):
         y = fluid.layers.fc(y, size=2048)
         y = fluid.layers.batch_norm(y)
         # 第二组全连接和BN层
-        y = fluid.layers.fc(y, size=128 * 8 * 8)
+        y = fluid.layers.fc(y, size=int(128 * (image_size / 4) * (image_size / 4)))
         y = fluid.layers.batch_norm(y)
         # 进行形状变换
-        y = fluid.layers.reshape(y, shape=(-1, 128, 8, 8))
+        y = fluid.layers.reshape(y, shape=[-1, 128, int((image_size / 4)), int((image_size / 4))])
         # 第一组转置卷积运算
-        y = deconv(x=y, num_filters=128, act='relu', output_size=[16, 16])
+        y = deconv(x=y, num_filters=128, act='relu', output_size=[int((image_size / 2)), int((image_size / 2))])
         # 第二组转置卷积运算
         y = deconv(x=y, num_filters=3, act='sigmoid', output_size=[image_size, image_size])
     return y
@@ -120,6 +123,7 @@ with fluid.program_guard(train_d_fake, startup):
     optimizer.minimize(fake_avg_cost, parameter_list=d_params)
 
 # 训练生成器G生成符合判别器D标准的假图片
+fake = None
 with fluid.program_guard(train_g, startup):
     # 噪声生成图片为真实图片的概率，Label为1
     z = fluid.layers.data(name='z', shape=[z_dim])
@@ -162,15 +166,20 @@ def cifar_reader(reader):
 
 # 保存图片
 def show_image_grid(images):
-    for i, image in enumerate(images[:64]):
+    for i, image in enumerate(images):
         image = image.transpose((2, 1, 0))
-        plt.imsave("image/test_%d.png" % i, image)
+        save_image_path = 'train_image'
+        if not os.path.exists(save_image_path):
+            os.makedirs(save_image_path)
+        plt.imsave(os.path.join(save_image_path, "test_%d.png" % i), image)
 
 
 # 生成真实图片reader
-mydata_generator = paddle.batch(reader=image_reader.train_reader('datasets', image_size), batch_size=128)
+mydata_generator = paddle.batch(reader=image_reader.train_reader('datasets', image_size), batch_size=32)
+# 使用CIFAR数据集
+# mydata_generator = paddle.batch(reader=cifar_reader(paddle.dataset.cifar.train10()), batch_size=32)
 # 生成假图片的reader
-z_generator = paddle.batch(z_reader, batch_size=128)()
+z_generator = paddle.batch(z_reader, batch_size=32)()
 
 # 创建执行器，最好使用GPU，CPU速度太慢了
 # place = fluid.CPUPlace()
@@ -213,3 +222,12 @@ for pass_id in range(100):
     r_i = np.array(r_i).astype(np.float32)
     # 显示生成的图片
     show_image_grid(r_i[0])
+
+    # 保存预测模型
+    save_path = 'infer_model/'
+    # 删除旧的模型文件
+    shutil.rmtree(save_path, ignore_errors=True)
+    # 创建保持模型文件目录
+    os.makedirs(save_path)
+    # 保存预测模型
+    fluid.io.save_inference_model(save_path, feeded_var_names=[z.name], target_vars=[fake], executor=exe, main_program=train_g)

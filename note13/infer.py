@@ -1,5 +1,5 @@
+import os
 import paddle
-
 import matplotlib.pyplot as plt
 import numpy as np
 import paddle.fluid as fluid
@@ -21,17 +21,20 @@ z_dim = 100
 # 噪声生成
 def z_reader():
     while True:
-        yield np.random.normal(-1.0, 1.0, (z_dim)).astype('float32')
+        yield np.random.uniform(-1.0, 1.0, (z_dim)).astype('float32')
 
 
 # 保存图片
-def show_image_grid(images):
-    for i, image in enumerate(images[:64]):
-        # 保存生成的图片
-        plt.imsave("image/test_%d.png" % i, image[0])
+def save_image(images):
+    for i, image in enumerate(images):
+        image = image.transpose((2, 1, 0))
+        save_image_path = 'infer_image'
+        if not os.path.exists(save_image_path):
+            os.makedirs(save_image_path)
+        plt.imsave(os.path.join(save_image_path, "test_%d.png" % i), image)
 
 
-z_generator = paddle.batch(z_reader, batch_size=128)()
+z_generator = paddle.batch(z_reader, batch_size=32)()
 test_z = np.array(next(z_generator))
 
 # 执行预测
@@ -45,5 +48,9 @@ r_i = exe.run(program=infer_program,
               feed={feeded_var_names[0]: test_z},
               fetch_list=target_var)
 
+r_i = np.array(r_i).astype(np.float32)
+
 # 显示生成的图片
-show_image_grid(r_i[0])
+save_image(r_i[0])
+
+print('生成图片完成')
