@@ -177,7 +177,7 @@ def show_image_grid(images):
 # 生成真实图片reader
 mydata_generator = paddle.batch(reader=image_reader.train_reader('datasets', image_size), batch_size=32)
 # 使用CIFAR数据集
-# mydata_generator = paddle.batch(reader=cifar_reader(paddle.dataset.cifar.train10()), batch_size=32)
+# mydata_generator = paddle.batch(reader=cifar_reader(paddle.dataset.cifar.train10()), batch_size=128)
 # 生成假图片的reader
 z_generator = paddle.batch(z_reader, batch_size=32)()
 
