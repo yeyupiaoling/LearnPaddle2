@@ -18,7 +18,6 @@ def train_mapper(sample):
     width = img.size[0]
     height = img.size[1]
     if width < height:
-        print('hello')
         ratio = width / crop_size
         width = width / ratio
         height = height / ratio
@@ -48,7 +47,6 @@ def train_mapper(sample):
     img = img.transpose((2, 0, 1))
     # 转换成BGR
     img = img[(2, 1, 0), :, :] / 255.0
-    print(img)
     return img
 
 
