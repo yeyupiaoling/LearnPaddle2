@@ -60,12 +60,15 @@ save_path = 'infer_model/'
 @app.route('/infer', methods=['POST'])
 def infer():
     f = request.files['img']
-    # 设置保存路径
+
+    # 保存图片
     save_father_path = 'images'
     img_path = os.path.join(save_father_path, str(uuid.uuid1()) + '.' + secure_filename(f.filename).split('.')[-1])
     if not os.path.exists(save_father_path):
         os.makedirs(save_father_path)
     f.save(img_path)
+
+    # 开始预测图片
     img = load_image(img_path)
     result = exe.run(program=infer_program,
                      feed={feeded_var_names[0]: img},
@@ -76,10 +79,12 @@ def infer():
 
     names = ['苹果', '哈密瓜', '胡萝卜', '樱桃', '黄瓜', '西瓜']
 
+    # 打印和返回预测结果
     r = '{"label":%d, "name":"%s", "possibility":%f}' % (lab, names[lab], result[0][0][lab])
     print(r)
     return r
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=80)
+    # 启动服务，并指定端口号
+    app.run(port=80)

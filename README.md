@@ -3,7 +3,7 @@ PaddlePaddle新版本Fluid教程，使用的PaddlePaddle版本为1.2.0，Python�
 
 # 文章博客地址
 
- 1. [PaddlePaddle从入门到炼丹一——AI Studio平台的使用](https://blog.csdn.net/qq_33200967/article/details/83052060)
+ 1. [PaddlePaddle从入门到炼丹一——新版本PaddlePaddle的安装](https://blog.csdn.net/qq_33200967/article/details/83052060)
  2. [PaddlePaddle从入门到炼丹二——计算1+1](https://blog.csdn.net/qq_33200967/article/details/83315808)
  3. [PaddlePaddle从入门到炼丹三——线性回归](https://blog.csdn.net/qq_33200967/article/details/83448448)
  4. [PaddlePaddle从入门到炼丹四——卷积神经网络](https://blog.csdn.net/qq_33200967/article/details/83506694)

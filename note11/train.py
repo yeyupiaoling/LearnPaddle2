@@ -32,7 +32,7 @@ opts = optimizer.minimize(avg_cost)
 train_reader = paddle.batch(reader=reader.train_reader('images/train.list', crop_size, resize_size), batch_size=32)
 test_reader = paddle.batch(reader=reader.test_reader('images/test.list', crop_size), batch_size=32)
 
-# 定义一个使用CPU的解析器
+# 定义一个使用GPU的执行器
 place = fluid.CUDAPlace(0)
 # place = fluid.CPUPlace()
 exe = fluid.Executor(place)

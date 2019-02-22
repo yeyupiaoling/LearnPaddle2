@@ -5,6 +5,7 @@
     <title>预测图像</title>
 </head>
 <body>
+<!--上传图片的表单-->
 <form action="http://127.0.0.1/upload" enctype="multipart/form-data" method="post">
     选择上传的图像：<input type="file" name="img"><br>
     <input type="submit" value="上传">
@@ -12,6 +13,7 @@
 
 <br><br>
 
+<!--调用服务器预测接口的表单-->
 <form action="http://127.0.0.1/infer" enctype="multipart/form-data" method="post">
     选择预测的图像：<input type="file" name="img"><br>
     <input type="submit" value="预测">
