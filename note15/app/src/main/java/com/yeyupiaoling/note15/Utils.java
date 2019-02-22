@@ -13,7 +13,7 @@ import java.io.InputStream;
 
 public class Utils {
 
-
+    // 获取预测值中最大概率的标签
     public static int getMaxResult(float[] result) {
         float probability = result[0];
         int r = 0;
@@ -26,7 +26,7 @@ public class Utils {
         return r;
     }
 
-
+    // 对将要预测的图片进行预处理
     public static float[] getScaledMatrix(Bitmap bitmap, int desWidth, int desHeight) {
         float[] dataBuf = new float[3 * desWidth * desHeight];
         int rIndex;
@@ -44,6 +44,7 @@ public class Utils {
             rIndex = j * desWidth + k;
             gIndex = rIndex + desHeight * desWidth;
             bIndex = gIndex + desHeight * desWidth;
+            // 转成RGB通道顺序，并除以255，跟训练的预处理一样
             dataBuf[rIndex] = (float) (((clr & 0x00ff0000) >> 16) / 255.0);
             dataBuf[gIndex] = (float) (((clr & 0x0000ff00) >> 8) / 255.0);
             dataBuf[bIndex] = (float) (((clr & 0x000000ff)) / 255.0);
@@ -55,7 +56,7 @@ public class Utils {
         return dataBuf;
     }
 
-    // compress picture
+    // 压缩图片，避免图片过大
     public static Bitmap getScaleBitmap(String filePath) {
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inJustDecodeBounds = true;
@@ -79,7 +80,7 @@ public class Utils {
     }
 
 
-    // get photo from Uri
+    // 根据相册返回的URI返回图片的绝对路径
     public static String getPathFromURI(Context context, Uri uri) {
         String result;
         Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
@@ -95,9 +96,10 @@ public class Utils {
     }
 
 
-    // copy file from asset to sdcard
+    // 复制莫模型文件到缓存目录
     public static void copyFileFromAsset(Context context, String oldPath, String newPath) {
         try {
+            // 预测模型文件在assets中的位置
             String[] fileNames = context.getAssets().list(oldPath);
             if (fileNames.length > 0) {
                 // directory

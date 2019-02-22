@@ -26,12 +26,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private String model_path;
+    // 模型文件夹
     private String assets_path = "infer_model";
     private boolean load_result = false;
+    // 输入图片的形状，分别是：batch size、通道数、宽度、高度
     private int[] ddims = {1, 3, 224, 224};
     private ImageView imageView;
     private TextView showTv;
 
+    // 加载PaddlePaddle的动态库
     static {
         try {
             System.loadLibrary("paddle-mobile");
@@ -48,11 +51,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        model_path = getCacheDir().getAbsolutePath() + File.separator + "infer_model";
+        // 初始化控件
         initView();
+        // 动态请求权限
         requestPermissions();
+        // 从assets中复制模型文件到缓存目录下
         Utils.copyFileFromAsset(this, assets_path, model_path);
     }
 
+    // 初始化控件
     private void initView(){
         Button loadBtn = findViewById(R.id.load);
         Button clearBtn = findViewById(R.id.clear);
@@ -60,9 +68,7 @@ public class MainActivity extends AppCompatActivity {
         showTv = findViewById(R.id.show);
         imageView = findViewById(R.id.image_view);
 
-        model_path = getCacheDir().getAbsolutePath() + File.separator + "infer_model";
-
-
+        // 加载模型点击事件
         loadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 清空模型点击事件
         clearBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 打开相册选择图片预测点击事件
         inferBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    // 回调事件
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         String image_path;
@@ -109,12 +118,14 @@ public class MainActivity extends AppCompatActivity {
                     if (data == null) {
                         return;
                     }
+                    // 获取相册返回的URI
                     Uri image_uri = data.getData();
-                    // get image path from uri
+                    // 根据图片的URI获取绝对路径
                     image_path = Utils.getPathFromURI(MainActivity.this, image_uri);
+                    // 压缩图片用于显示
                     Bitmap bitmap = Utils.getScaleBitmap(image_path);
                     imageView.setImageBitmap(bitmap);
-                    // predict image
+                    // 开始预测图片
                     predictImage(image_path);
                     break;
             }
@@ -122,29 +133,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    // 根据图片的路径预测图片
     private void predictImage(String image_path) {
-        // picture to float array
+        // 把图片进行压缩
         Bitmap bmp = Utils.getScaleBitmap(image_path);
+        // 把图片转换成浮点数组，用于预测
         float[] inputData = Utils.getScaledMatrix(bmp, ddims[2], ddims[3]);
         try {
             long start = System.currentTimeMillis();
-            // get predict result
+            // 执行预测，获取预测结果
             float[] result = PML.predictImage(inputData, ddims);
             long end = System.currentTimeMillis();
-            // show predict result and time
+            // 获取概率最大的标签
             int r = Utils.getMaxResult(result);
+            // 获取标签对应的类别名称
             String[] names = {"苹果", "哈密瓜", "胡萝卜", "樱桃", "黄瓜", "西瓜"};
             String show_text = "标签：" + r + "\n名称：" + names[r] + "\n概率：" + result[r] + "\n时间：" + (end - start) + "ms";
+            // 显示预测结果
             showTv.setText(show_text);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // 多权限动态申请
     private void requestPermissions() {
-
         List<String> permissionList = new ArrayList<>();
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
