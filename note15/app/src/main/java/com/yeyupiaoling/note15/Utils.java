@@ -44,9 +44,9 @@ public class Utils {
             rIndex = j * desWidth + k;
             gIndex = rIndex + desHeight * desWidth;
             bIndex = gIndex + desHeight * desWidth;
-            dataBuf[rIndex] = (float) ((clr & 0x00ff0000) >> 16) - 148;
-            dataBuf[gIndex] = (float) ((clr & 0x0000ff00) >> 8) - 148;
-            dataBuf[bIndex] = (float) ((clr & 0x000000ff)) - 148;
+            dataBuf[rIndex] = (float) (((clr & 0x00ff0000) >> 16) / 255.0);
+            dataBuf[gIndex] = (float) (((clr & 0x0000ff00) >> 8) / 255.0);
+            dataBuf[bIndex] = (float) (((clr & 0x000000ff)) / 255.0);
 
         }
         if (bm.isRecycled()) {
