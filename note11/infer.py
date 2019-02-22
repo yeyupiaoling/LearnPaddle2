@@ -29,7 +29,7 @@ def load_image(file):
 
 
 # 获取图片数据
-img = load_image('images/watermelon/0aa131d2-31de-11e9-915c-3c970e769528.jpg')
+img = load_image('images/apple/0fdd5422-31e0-11e9-9cfd-3c970e769528.jpg')
 
 # 执行预测
 result = exe.run(program=infer_program,

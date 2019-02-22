@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/ll"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/load"
+            android:text="加载模型"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:id="@+id/clear"
+            android:layout_weight="1"
+            android:text="清空模型"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:id="@+id/infer"
+            android:layout_weight="1"
+            android:text="预测图片"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_above="@id/ll"
+        android:id="@+id/show"
+        android:hint="这里显示预测结果"
+        android:layout_width="match_parent"
+        android:layout_height="100dp" />
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_above="@id/show"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</RelativeLayout>
