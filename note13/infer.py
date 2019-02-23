@@ -24,6 +24,10 @@ def z_reader():
         yield np.random.uniform(-1.0, 1.0, (z_dim)).astype('float32')
 
 
+z_generator = paddle.batch(z_reader, batch_size=32)()
+test_z = np.array(next(z_generator))
+
+
 # 保存图片
 def save_image(images):
     for i, image in enumerate(images):
@@ -32,15 +36,6 @@ def save_image(images):
         if not os.path.exists(save_image_path):
             os.makedirs(save_image_path)
         plt.imsave(os.path.join(save_image_path, "test_%d.png" % i), image)
-
-
-z_generator = paddle.batch(z_reader, batch_size=32)()
-test_z = np.array(next(z_generator))
-
-# 执行预测
-result = exe.run(program=infer_program,
-                 feed={feeded_var_names[0]: test_z},
-                 fetch_list=target_var)
 
 
 # 测试生成的图片
