@@ -1,14 +1,11 @@
 import json
 import os
 
-# 把生产的数据列表都放在自己的总类别文件夹中
-data_list_path = "images/"
-
 
 def create_data_list(data_root_path):
-    with open(data_list_path + "test.list", 'w') as f:
+    with open(data_root_path + "test.list", 'w') as f:
         pass
-    with open(data_list_path + "train.list", 'w') as f:
+    with open(data_root_path + "train.list", 'w') as f:
         pass
     # 所有类别的信息
     class_detail = []
@@ -47,16 +44,16 @@ def create_data_list(data_root_path):
             # 每张图片的路径
             name_path = class_dir + '/' + img_path
             # 如果不存在这个文件夹,就创建
-            if not os.path.exists(data_list_path):
-                os.makedirs(data_list_path)
+            if not os.path.exists(data_root_path):
+                os.makedirs(data_root_path)
             # 每10张图片取一个做测试数据
             if class_sum % 10 == 0:
                 test_sum += 1
-                with open(data_list_path + "test.list", 'a') as f:
+                with open(data_root_path + "test.list", 'a') as f:
                     f.write(name_path + "\t%d" % class_label + "\n")
             else:
                 trainer_sum += 1
-                with open(data_list_path + "train.list", 'a') as f:
+                with open(data_root_path + "train.list", 'a') as f:
                     f.write(name_path + "\t%d" % class_label + "\n")
             class_sum += 1
             all_class_images += 1
@@ -76,10 +73,12 @@ def create_data_list(data_root_path):
     readjson['all_class_images'] = all_class_images
     readjson['class_detail'] = class_detail
     jsons = json.dumps(readjson, sort_keys=True, indent=4, separators=(',', ': '))
-    with open(data_list_path + "readme.json", 'w') as f:
+    with open(data_root_path + "readme.json", 'w') as f:
         f.write(jsons)
     print('图像列表已生成')
 
 
 if __name__ == '__main__':
-    create_data_list('images')
+    # 把生产的数据列表都放在自己的总类别文件夹中
+    data_root_path = "images/"
+    create_data_list(data_root_path)
