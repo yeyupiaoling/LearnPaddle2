@@ -1,6 +1,5 @@
 import os
 import random
-
 import requests
 import json
 import time
@@ -110,5 +109,3 @@ if __name__ == '__main__':
     dict_path = "datasets/dict_txt.txt"
     # 下载数据集
     get_routine(data_path)
-    # 创建数据字典
-    create_dict(data_path, dict_path)
