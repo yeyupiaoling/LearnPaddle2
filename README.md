@@ -13,6 +13,11 @@ PaddlePaddle新版本Fluid教程，使用的PaddlePaddle版本为1.2.0，Python�
  8. [PaddlePaddle从入门到炼丹八——模型的保存与使用](https://blog.csdn.net/qq_33200967/article/details/86516515)
  9. [PaddlePaddle从入门到炼丹九——迁移学习](https://blog.csdn.net/qq_33200967/article/details/86532750)
  10. [PaddlePaddle从入门到炼丹十——VisulDL可视化](https://blog.csdn.net/qq_33200967/article/details/86532831)
+ 11. [PaddlePaddle从入门到炼丹十一——自定义图像数据集识别](https://blog.csdn.net/qq_33200967/article/details/87895105)
+ 12. [PaddlePaddle从入门到炼丹十二——自定义文本数据集分类](https://blog.csdn.net/qq_33200967/article/details/87895355)
+ 13. [PaddlePaddle从入门到炼丹十三——自定义图像数生成](https://blog.csdn.net/qq_33200967/article/details/87895455)
+ 14. [PaddlePaddle从入门到炼丹十四——把预测模型部署在服务器](https://blog.csdn.net/qq_33200967/article/details/87895601)
+ 15. [PaddlePaddle从入门到炼丹十五——把预测模型部署到Android手机上](https://blog.csdn.net/qq_33200967/article/details/87895618)
 
  
 # 补充
