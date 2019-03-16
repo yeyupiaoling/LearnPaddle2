@@ -1,9 +1,14 @@
-﻿暂时这样凑合着看，之后有时间再补充文字说明。[微笑]
+﻿@[TOC]
 
-@[TOC]
+GitHub地址：https://github.com/yeyupiaoling/LearnPaddle2/tree/master/note11
+
+# 前言
+本章将介绍如何使用PaddlePaddle训练自己的图片数据集，在之前的图像数据集中，我们都是使用PaddlePaddle自带的数据集，本章我们就来学习如何让PaddlePaddle训练我们自己的图片数据集。
 
 # 爬取图像
-`download_image.py`文件：
+在本章中，我们使用的是自己的图片数据集，所以我们需要弄一堆图像来制作训练的数据集。下面我们就编写一个爬虫程序，让其帮我们从百度图片中爬取相应类别的图片。
+
+创建一个`download_image.py`文件用于编写爬取图片程序。首先导入所需的依赖包。
 ```python
 import re
 import uuid
@@ -14,6 +19,7 @@ import imghdr
 from PIL import Image
 ```
 
+然后编写一个下载图片的函数，这个是程序核心代码。参数是下载图片的关键、保存的名字、下载图片的数量。关键字是百度搜索图片的关键。
 ```python
 # 获取百度图片下载图片
 def download_image(key_word, save_name, download_max):
@@ -57,6 +63,7 @@ def download_image(key_word, save_name, download_max):
     print('下载完成')
 ```
 
+图片下载完成之后，需要删除一家损坏的图片，因为在下载的过程中，由于图片本身的问题或者下载过程造成的图片损坏，需要把这些已经损坏的图片上传。下面的函数就是删除所有损坏的图片，根据图像数据集的目录读取获取所有图片文件的路径，然后使用`imghdr`工具获取图片的类型是否为`png`或者`jpg`来判断图片文件是否完整，最后再删除根据图片的通道数据来删除灰度图片。
 ```python
 # 删除不是JPEG或者PNG格式的图片
 def delete_error_image(father_path):
@@ -90,6 +97,7 @@ def delete_error_image(father_path):
         pass
 ```
 
+最后在main入口中通过调用两个函数来完成下载图像数据集，使用中文进行百度搜索图片，使用英文是为了出现中文路径导致图片读取错误。
 ```python
 if __name__ == '__main__':
     # 定义要下载的图片中文名称和英文名称，ps：英文名称主要是为了设置文件夹名
@@ -112,9 +120,11 @@ if __name__ == '__main__':
 正在下载 哈密瓜 的第 10 张图片.....
 ```
 
+**注意：** 下载处理完成之后，还可能存在其他杂乱的图片，所以还需要我们手动删除这些不属于这个类别的图片，这才算完成图像数据集的制作。
+
 
 # 创建图像列表
-`create_data_list.py`文件：
+创建一个`create_data_list.py`文件，在这个程序中，我们只要把爬取保存图片的路径的文件夹路径传进去就可以了，生成固定格式的列表，格式为`图片的路径 <Tab> 图片类别的标签`：
 ```python
 import json
 import os
@@ -195,6 +205,7 @@ def create_data_list(data_root_path):
     print('图像列表已生成')
 ```
 
+最后执行就可以生成图像的列表。
 ```python
 if __name__ == '__main__':
     # 把生产的数据列表都放在自己的总类别文件夹中
@@ -213,8 +224,38 @@ if __name__ == '__main__':
 图像列表已生成
 ```
 
+运行这个程序之后，会生成在data文件夹中生成一个单独的大类文件夹，比如我们这次是使用到蔬菜类，所以我生成一个`vegetables`文件夹，在这个文件夹下有3个文件：
+|文件名|作用|
+|:---:|:---:|
+|trainer.list|用于训练的图像列表|
+|test.list|用于测试的图像列表|
+|readme.json|该数据集的json格式的说明,方便以后使用|
+
+`readme.json`文件的格式如下，可以很清楚看到整个数据的图像数量,总类别名称和类别数量，还有每个类对应的标签，类别的名字，该类别的测试数据和训练数据的数量：
+```json
+{
+    "all_class_images": 2200,
+    "all_class_name": "images",
+    "all_class_sum": 2,
+    "class_detail": [
+        {
+            "class_label": 1,
+            "class_name": "watermelon",
+            "class_test_images": 110,
+            "class_trainer_images": 990
+        },
+        {
+            "class_label": 2,
+            "class_name": "cantaloupe",
+            "class_test_images": 110,
+            "class_trainer_images": 990
+        }
+    ]
+}
+```
+
 # 定义模型
-`mobilenet_v1.py`文件：
+创建一个`mobilenet_v1.py`文件，在本章我们使用的是MobileNet神经网络，MobileNet是Google针对手机等嵌入式设备提出的一种轻量级的深层神经网络，它的核心思想就是卷积核的巧妙分解，可以有效减少网络参数，从而达到减小训练时网络的模型。因为太大的模型模型文件是不利于移植到移动设备上的，比如我们把模型文件迁移到Android手机应用上，那么模型文件的大小就直接影响应用安装包的大小。以下就是使用PaddlePaddle定义的MobileNet神经网络：
 ```python
 import paddle.fluid as fluid
 
@@ -342,7 +383,9 @@ def net(input, class_dim, scale=1.0):
 ```
 
 # 定义数据读取
-`reader.py`文件：
+创建一个`reader.py`文件，这个程序就是用户训练和测试的使用读取数据的。训练的时候，通过这个程序从本地读取图片，然后通过一系列的预处理操作，最后转换成训练所需的Numpy数组。
+
+首先导入所需的包，其中`cpu_count`是获取当前计算机有多少个CPU，然后使用多线程读取数据。
 ```python
 import os
 import random
@@ -352,6 +395,7 @@ import paddle
 from PIL import Image
 ```
 
+首先定义一个`train_mapper()`函数，这个函数是根据传入进来的图片路径来对图片进行预处理，比如训练的时候需要统一图片的大小，同时也使用多种的数据增强的方式，如水平翻转、垂直翻转、角度翻转、随机裁剪，这些方式都可以让有限的图片数据集在训练的时候成倍的增加。最后因为PIL打开图片存储顺序为H(高度)，W(宽度)，C(通道)，PaddlePaddle要求数据顺序为CHW，所以需要转换顺序。最后返回的是处理后的图片数据和其对应的标签。
 ```python
 # 训练图片的预处理
 def train_mapper(sample):
@@ -387,6 +431,7 @@ def train_mapper(sample):
         print("%s 该图片错误，请删除该图片并重新创建图像数据列表" % img_path)
 ```
 
+这个`train_reader()`函数是根据已经创建的图像列表解析得到每张图片的路径和其他对应的标签，然后使用`paddle.reader.xmap_readers()`把数据传递给上面定义的`train_mapper()`函数进行处理，最后得到一个训练所需的reader。
 ```python
 # 获取训练的reader
 def train_reader(train_list_path, crop_size, resize_size):
@@ -404,9 +449,9 @@ def train_reader(train_list_path, crop_size, resize_size):
                 yield img, label, crop_size, resize_size
 
     return paddle.reader.xmap_readers(train_mapper, reader, cpu_count(), 102400)
-
 ```
 
+这是一个测试数据的预处理函数`test_mapper()`，这个没有做太多处理，因为测试的数据不需要数据增强操作，只需统一图片大小和设置好图片的通过顺序和数据类型即可。
 ```python
 # 测试图片的预处理
 def test_mapper(sample):
@@ -423,6 +468,7 @@ def test_mapper(sample):
     return img, int(label)
 ```
 
+这个是测试的reader函数`test_reader()`，这个跟训练的reader函数定义一样。
 ```python
 # 测试的图片reader
 def test_reader(test_list_path, crop_size):
@@ -440,7 +486,9 @@ def test_reader(test_list_path, crop_size):
 ```
 
 # 训练模型
-`train.py`文件：
+万事俱备，只等训练了。关于PaddlePaddle训练流程，我们已经非常熟悉了，那么我们就简单地过一遍。
+
+创建`train.py`文件，首先导入所需的包，其中包括我们定义的MobileNet模型和数据读取程序：
 ```python
 import os
 import shutil
@@ -450,6 +498,7 @@ import reader
 import paddle.fluid as fluid
 ```
 
+然后定义数据输入层，这次我们使用的是图片大小是224，这比之前使用的CIFAR数据集的32大小要大很多，所以训练其他会慢不少。至于`resize_size`是用于统一缩放到这个大小，然后再随机裁剪成`crop_size`大小，`crop_size`才是最终训练图片的大小。
 ```python
 crop_size = 224
 resize_size = 250
@@ -459,13 +508,13 @@ image = fluid.layers.data(name='image', shape=[3, crop_size, crop_size], dtype='
 label = fluid.layers.data(name='label', shape=[1], dtype='int64')
 ```
 
-
+接着获取MobileNet网络的分类器，传入的第一个参数就是上面定义的输入层，第二个是分类的类别大小，比如我们这次爬取的图像类别数量是6个。
 ```python
 # 获取分类器，因为这次只爬取了6个类别的图片，所以分类器的类别大小为6
 model = mobilenet_v1.net(image, 6)
 ```
 
-
+再接着是获取损失函数和平均准确率函数，还有测试程序和优化方法，这个优化方法我加了正则，因为爬取的图片数量太少，在训练容易过拟合，所以加上正则一定程度上可以抑制过拟合。
 ```python
 # 获取损失函数和准确率函数
 cost = fluid.layers.cross_entropy(input=model, label=label)
@@ -481,14 +530,14 @@ optimizer = fluid.optimizer.AdamOptimizer(learning_rate=1e-3,
 opts = optimizer.minimize(avg_cost)
 ```
 
-
+这里就是获取训练测试是所以想的数据读取reader，通过使用`paddle.batch()`函数可以把多条数据打包成一个批次，训练的时候是按照一个个批次训练的。
 ```python
 # 获取自定义数据
 train_reader = paddle.batch(reader=reader.train_reader('images/train.list', crop_size, resize_size), batch_size=32)
 test_reader = paddle.batch(reader=reader.test_reader('images/test.list', crop_size), batch_size=32)
 ```
 
-
+执行训练之前，还需要创建一个执行器，建议使用GPU进行训练，因为我们训练的图片比较大，所以使用CPU训练速度会相当的慢。
 ```python
 # 定义一个使用GPU的执行器
 place = fluid.CUDAPlace(0)
@@ -501,9 +550,9 @@ exe.run(fluid.default_startup_program())
 feeder = fluid.DataFeeder(place=place, feed_list=[image, label])
 ```
 
-
+最后终于可以执行训练了，这里跟在前些章节都几乎一样，就不重复介绍了。
 ```python
-# 训练10次
+# 训练100次
 for pass_id in range(100):
     # 进行训练
     for batch_id, data in enumerate(train_reader()):
@@ -531,7 +580,7 @@ for pass_id in range(100):
     print('Test:%d, Cost:%0.5f, Accuracy:%0.5f' % (pass_id, test_cost, test_acc))
 ```
 
-
+训练的过程中可以保存预测模型，用于之后的预测。笔者一般是每一个pass保存一次模型。
 ```python
     # 保存预测模型
     save_path = 'infer_model/'
@@ -543,15 +592,31 @@ for pass_id in range(100):
     fluid.io.save_inference_model(save_path, feeded_var_names=[image.name], target_vars=[model], executor=exe)
 ```
 
+训练输出的信息：
+```
+Pass:0, Batch:0, Cost:1.84754, Accuracy:0.15625
+Test:0, Cost:4.66276, Accuracy:0.17857
+Pass:1, Batch:0, Cost:1.04008, Accuracy:0.59375
+Test:1, Cost:1.23828, Accuracy:0.54464
+Pass:2, Batch:0, Cost:1.04778, Accuracy:0.65625
+Test:2, Cost:0.99189, Accuracy:0.64286
+Pass:3, Batch:0, Cost:1.21555, Accuracy:0.65625
+Test:3, Cost:1.01552, Accuracy:0.57589
+Pass:4, Batch:0, Cost:0.64620, Accuracy:0.81250
+Test:4, Cost:1.19264, Accuracy:0.63393
+```
+
 # 预测图片
-`infer.py`文件：
+经过上面训练后，得到了一个预测模型，下面我们就使用一个预测模型来预测一些图片。
+
+创建一个`infer.py`文件作为预测程序。首先导入所需的依赖包。
 ```python
 import paddle.fluid as fluid
 from PIL import Image
 import numpy as np
 ```
 
-
+创建一个执行器，这些不需要训练，所以可以使用CPU进行预测，速度不会太慢，当然，使用GPU的预测速度会更快一些。
 ```python
 # 创建执行器
 place = fluid.CPUPlace()
@@ -559,7 +624,7 @@ exe = fluid.Executor(place)
 exe.run(fluid.default_startup_program())
 ```
 
-
+然后加载预测模型，获取预测程序和输入层的名字，还有网络的分类器。
 ```python
 # 保存预测模型路径
 save_path = 'infer_model/'
@@ -567,7 +632,7 @@ save_path = 'infer_model/'
 [infer_program, feeded_var_names, target_var] = fluid.io.load_inference_model(dirname=save_path, executor=exe)
 ```
 
-
+预测图片之前，还需要对图片进行预处理，处理的方式跟测试的时候处理的方式一样。
 ```python
 # 预处理图片
 def load_image(file):
@@ -584,7 +649,7 @@ def load_image(file):
     return img
 ```
 
-
+最后获取经过预处理的图片数据，再使用这些图像数据进行预测，得到分类结果。
 ```python
 # 获取图片数据
 img = load_image('images/apple/0fdd5422-31e0-11e9-9cfd-3c970e769528.jpg')
@@ -595,6 +660,7 @@ result = exe.run(program=infer_program,
                  fetch_list=target_var)
 ```
 
+我们可以通过解析分类的结果，获取概率最大类别标签。关于预测输出的`result`是数据，它是3维的，第一层是输出本身就是一个数组，第二层图片的数量，因为PaddlePaddle支持多张图片同时预测，最后一层就是每个类别的概率，这个概率的总和为1，概率最大的标签就是预测结果。
 ```python
 # 显示图片并输出结果最大的label
 lab = np.argsort(result)[0][0][-1]
@@ -604,5 +670,10 @@ names = ['苹果', '哈密瓜', '胡萝卜', '樱桃', '黄瓜', '西瓜']
 print('预测结果标签为：%d， 名称为：%s， 概率为：%f' % (lab, names[lab], result[0][0][lab]))
 ```
 
+预测输出的结果：
+```
+预测结果标签为：0， 名称为：苹果， 概率为：0.948698
+```
 
-
+# 参考资料
+1. https://yeyupiaoling.blog.csdn.net/article/details/79095265
