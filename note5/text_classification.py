@@ -54,6 +54,9 @@ dict_dim = len(word_dict)
 model = lstm_net(words, dict_dim)
 # model = rnn_net(words, dict_dim)
 
+# 获取预测程序
+infer_program = fluid.default_main_program().clone(for_test=True)
+
 # 获取损失函数和准确率
 cost = fluid.layers.cross_entropy(input=model, label=label)
 avg_cost = fluid.layers.mean(cost)
@@ -67,8 +70,8 @@ optimizer = fluid.optimizer.AdagradOptimizer(learning_rate=0.002)
 opt = optimizer.minimize(avg_cost)
 
 # 创建一个执行器，CPU训练速度比较慢
-place = fluid.CPUPlace()
-# place = fluid.CUDAPlace(0)
+# place = fluid.CPUPlace()
+place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())
@@ -129,8 +132,8 @@ base_shape = [[len(c) for c in lod]]
 tensor_words = fluid.create_lod_tensor(lod, base_shape, place)
 
 # 预测获取预测结果,因为输入的是3个数据，所以要模拟3个label的输入
-results = exe.run(program=test_program,
-                  feed={'words': tensor_words, 'label': np.array([[0], [0], [0]]).astype('int64')},
+results = exe.run(program=infer_program,
+                  feed={'words': tensor_words},
                   fetch_list=[model])
 # 打印每句话的正负面概率
 for i, r in enumerate(results[0]):

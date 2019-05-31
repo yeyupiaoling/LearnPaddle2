@@ -55,12 +55,15 @@ label = fluid.layers.data(name='label', shape=[1], dtype='int64')
 # model = multilayer_perceptron(image)
 model = convolutional_neural_network(image)
 
+# 获取预测程序
+infer_program = fluid.default_main_program().clone(for_test=True)
+
 # 获取损失函数和准确率函数
 cost = fluid.layers.cross_entropy(input=model, label=label)
 avg_cost = fluid.layers.mean(cost)
 acc = fluid.layers.accuracy(input=model, label=label)
 
-# 获取训练和测试程序
+# 获取测试程序
 test_program = fluid.default_main_program().clone(for_test=True)
 
 # 定义优化方法
@@ -73,6 +76,7 @@ test_reader = paddle.batch(mnist.test(), batch_size=128)
 
 # 定义一个使用CPU的执行器
 place = fluid.CPUPlace()
+# place = fluid.CUDAPlace(0)
 exe = fluid.Executor(place)
 # 进行参数初始化
 exe.run(fluid.default_startup_program())
@@ -81,7 +85,7 @@ exe.run(fluid.default_startup_program())
 feeder = fluid.DataFeeder(place=place, feed_list=[image, label])
 
 # 开始训练和测试
-for pass_id in range(10):
+for pass_id in range(1):
     # 进行训练
     for batch_id, data in enumerate(train_reader()):
         train_cost, train_acc = exe.run(program=fluid.default_main_program(),
@@ -118,8 +122,8 @@ def load_image(file):
 
 # 加载数据并开始预测
 img = load_image('image/infer_3.png')
-results = exe.run(program=test_program,
-                  feed={'image': img, "label": np.array([[1]]).astype("int64")},
+results = exe.run(program=infer_program,
+                  feed={'image': img},
                   fetch_list=[model])
 # 获取概率最大的标签
 lab = np.argsort(results)[0][0][-1]

@@ -6,6 +6,9 @@ x = fluid.layers.data(name='x', shape=[1], dtype='float32')
 hidden = fluid.layers.fc(input=x, size=100, act='relu')
 net = fluid.layers.fc(input=hidden, size=1, act=None)
 
+# 获取预测程序
+infer_program = fluid.default_main_program().clone(for_test=True)
+
 # 定义损失函数
 y = fluid.layers.data(name='y', shape=[1], dtype='float32')
 cost = fluid.layers.square_error_cost(input=net, label=y)
@@ -37,7 +40,7 @@ for pass_id in range(100):
     print("Pass:%d, Cost:%0.5f" % (pass_id, train_cost[0]))
 
 # 开始预测
-result = exe.run(program=test_program,
-                 feed={'x': test_data, 'y': np.array([[0.0]]).astype('float32')},
+result = exe.run(program=infer_program,
+                 feed={'x': test_data},
                  fetch_list=[net])
 print("当x为6.0时，y为：%0.5f:" % result[0][0][0])
