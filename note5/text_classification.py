@@ -123,7 +123,7 @@ UNK = word_dict['<unk>']
 lod = []
 for c in reviews:
     # 需要把单词进行字符串编码转换
-    lod.append([word_dict.get(words.encode('utf-8'), UNK) for words in c])
+    lod.append([np.int64(word_dict.get(words.encode('utf-8'), UNK)) for words in c])
 
 # 获取每句话的单词数量
 base_shape = [[len(c) for c in lod]]

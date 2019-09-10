@@ -25,7 +25,7 @@ def get_data(sentence):
         # 判断是否存在未知字符
         if not s in keys:
             s = '<unk>'
-        data.append(int(dict_txt[s]))
+        data.append(np.int64(dict_txt[s]))
     return data
 
 
