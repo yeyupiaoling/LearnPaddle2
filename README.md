@@ -3,21 +3,22 @@ PaddlePaddle新版本Fluid教程，使用的PaddlePaddle版本为1.2.0，Python�
 
 # 文章博客地址
 
- 1. [PaddlePaddle从入门到炼丹一——新版本PaddlePaddle的安装](https://blog.csdn.net/qq_33200967/article/details/83052060)
- 2. [PaddlePaddle从入门到炼丹二——计算1+1](https://blog.csdn.net/qq_33200967/article/details/83315808)
- 3. [PaddlePaddle从入门到炼丹三——线性回归](https://blog.csdn.net/qq_33200967/article/details/83448448)
- 4. [PaddlePaddle从入门到炼丹四——卷积神经网络](https://blog.csdn.net/qq_33200967/article/details/83506694)
- 5. [PaddlePaddle从入门到炼丹五——循环神经网络](https://blog.csdn.net/qq_33200967/article/details/83689527)
- 6. [PaddlePaddle从入门到炼丹六——生成对抗网络](https://blog.csdn.net/qq_33200967/article/details/83714930)
- 7. [PaddlePaddle从入门到炼丹七——强化学习](https://blog.csdn.net/qq_33200967/article/details/86505106)
- 8. [PaddlePaddle从入门到炼丹八——模型的保存与使用](https://blog.csdn.net/qq_33200967/article/details/86516515)
- 9. [PaddlePaddle从入门到炼丹九——迁移学习](https://blog.csdn.net/qq_33200967/article/details/86532750)
- 10. [PaddlePaddle从入门到炼丹十——VisulDL可视化](https://blog.csdn.net/qq_33200967/article/details/86532831)
- 11. [PaddlePaddle从入门到炼丹十一——自定义图像数据集识别](https://blog.csdn.net/qq_33200967/article/details/87895105)
- 12. [PaddlePaddle从入门到炼丹十二——自定义文本数据集分类](https://blog.csdn.net/qq_33200967/article/details/87895355)
- 13. [PaddlePaddle从入门到炼丹十三——自定义图像数生成](https://blog.csdn.net/qq_33200967/article/details/87895455)
- 14. [PaddlePaddle从入门到炼丹十四——把预测模型部署在服务器](https://blog.csdn.net/qq_33200967/article/details/87895601)
- 15. [PaddlePaddle从入门到炼丹十五——把预测模型部署到Android手机上](https://blog.csdn.net/qq_33200967/article/details/87895618)
+
+* [第一章 新版本PaddlePaddle的安装](https://blog.doiduoyi.com/articles/1584974303857.html)
+* [第二章 计算1+1](https://blog.doiduoyi.com/articles/1584974387872.html)
+* [第三章 线性回归](https://blog.doiduoyi.com/articles/1584974471592.html)
+* [第四章 卷积神经网络](https://blog.doiduoyi.com/articles/1584974540988.html)
+* [第五章 循环神经网络](https://blog.doiduoyi.com/articles/1584974601202.html)
+* [第六章 生成对抗网络](https://blog.doiduoyi.com/articles/1584974661687.html)
+* [第七章 强化学习](https://blog.doiduoyi.com/articles/1584974728689.html)
+* [第八章 模型的保存与使用](https://blog.doiduoyi.com/articles/1584974792165.html)
+* [第九章 迁移学习](https://blog.doiduoyi.com/articles/1584974849177.html)
+* [第十章 VisualDL 训练可视化](https://blog.doiduoyi.com/articles/1584974915236.html)
+* [第十一章 自定义图像数据集识别](https://blog.doiduoyi.com/articles/1584974968544.html)
+* [第十二章 自定义文本数据集分类](https://blog.doiduoyi.com/articles/1584975038292.html)
+* [第十三章 自定义图像数生成](https://blog.doiduoyi.com/articles/1584975142214.html)
+* [第十四章 把预测模型部署在服务器](https://blog.doiduoyi.com/articles/1584975208040.html)
+* [第十五章 把预测模型部署到Android手机上](https://blog.doiduoyi.com/articles/1584975263604.html)
 
  
 # 补充
